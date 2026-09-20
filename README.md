@@ -16,7 +16,9 @@ Already created your database and login? Start at step 4.
 6. Select **Deploy**, open your new page, and sign in with the email/password from step 3.
 7. Log your measured weight, choose **kg** or **lbs**, and confirm when you measured it. Save, then refresh: the same reading should remain on the graph and in its history.
 
-Project settings are configured once on Vercel. The page gets only the public URL and publishable key from `/api/config`; visitors just sign in. Never use a secret or service-role key. The browser sends the login directly to Supabase, and the signed-in session stays in this tab. The database password is not your login password.
+Project settings are configured once on Vercel. The page gets only the public URL and publishable key from `/api/config`; visitors just sign in. Never use a secret or service-role key. The browser sends the login directly to Supabase and remembers the session in local browser storage, with automatic token refresh. Your password is not saved by the page. **Sign out** clears that remembered session and the private view in other tabs on the same site. The database password is not your login password.
+
+Use the same production URL each time, including for your Home Screen shortcut. Browser sessions belong to an origin: a different preview or immutable deployment URL has a separate login. Clearing site data, private browsing, or the project's session expiry settings can require another sign-in. This update clears the old tab-only session without copying it; sign in once more to start the remembered session. If browser storage is blocked, the page explains that instead of silently using a temporary login.
 
 ## Optional: progress photos
 
