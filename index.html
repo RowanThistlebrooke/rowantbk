@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#080c0d">
+<title>BODY · Your Wire</title>
+<style>
+
+:root{color-scheme:dark;--bg:#080c0d;--ink:#eef4f2;--muted:#a5b6b2;--line:#263532;--mint:#89ebcb;--blue:#a6caff;--error:#ffae9f;--sans:Inter,"Helvetica Neue",Arial,sans-serif;--mono:ui-monospace,SFMono-Regular,Consolas,monospace}
+*{box-sizing:border-box}[hidden]{display:none!important}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 var(--sans);font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}button,input,select{font:inherit}button,a,input,select,summary{outline-offset:5px}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible,.plot:focus-visible{outline:2px solid var(--mint)}button{cursor:pointer;color:inherit}button:disabled{cursor:default;opacity:.5}a{color:var(--mint)}button{transition:color .15s,border-color .15s,background .15s}input,select{border-radius:5px;background:#0c1412;color:var(--ink);border:1px solid var(--line);padding:12px;width:100%;min-width:0}input::placeholder{color:#869b93}input:focus,select:focus{border-color:var(--mint)}.wrap{width:min(1280px,100%);padding:0 38px;margin:auto}header{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:25px 0}.brand{font-size:28px;font-weight:800;letter-spacing:-.08em}.brand span{color:var(--mint)}.header-right{display:flex;align-items:center;gap:18px}.quiet-button{border:1px solid var(--line);border-radius:5px;padding:9px 15px;background:transparent;font-size:13px;font-weight:600}.quiet-button:hover{border-color:var(--mint);color:var(--mint)}.text-button{border:0;background:transparent;padding:7px 0;color:var(--muted);font-size:13px}.text-button:hover{color:var(--mint)}.status{font-size:12px;color:var(--muted)}.status.connected:before{content:"";display:inline-block;width:5px;height:5px;background:var(--mint);border-radius:50%;margin-right:8px}.hero{position:relative;isolation:isolate;padding:30px 0 0}.hero:before{content:"";position:absolute;inset:-40px -50px -20px;z-index:-1;background:radial-gradient(ellipse at 60% 40%,#74d6b711,transparent 68%);pointer-events:none}.hero-top{display:flex;align-items:flex-end;justify-content:space-between;gap:28px;margin-bottom:24px}.eyebrow{font:11px var(--mono);letter-spacing:.17em;color:var(--mint)}h1{font-size:clamp(66px,8vw,106px);font-weight:600;line-height:1;letter-spacing:-.07em;margin:10px 0 0}.latest-block{text-align:right;min-width:0}.point-metric{font-size:14px;color:var(--muted);margin:0 0 5px;text-transform:capitalize}.latest{display:flex;align-items:baseline;justify-content:flex-end;gap:9px;overflow-wrap:anywhere}.latest strong{font-size:clamp(46px,6vw,78px);font-weight:500;line-height:1.07;letter-spacing:-.06em;min-width:0;overflow-wrap:anywhere}.latest span{font-size:16px;color:var(--muted)}.latest-time{font-size:12px;color:var(--muted);margin:8px 0 0}.chart-area{position:relative;min-height:300px}.plot{width:100%;height:300px;display:block;overflow:visible;touch-action:pan-y}.plot text{font:11px var(--mono);fill:var(--muted)}.plot .focus-ring{fill:none;stroke:var(--mint);stroke-opacity:.22;stroke-width:10}.chart-empty{min-height:300px;display:grid;place-content:center;text-align:center;justify-items:center}.empty-mark{width:54px;height:54px;margin-bottom:14px}.chart-empty h2{font-size:21px;letter-spacing:-.035em;font-weight:500;margin:0 0 6px}.chart-empty p{font-size:14px;max-width:340px;margin:0;color:var(--muted)}.chart-toolbar{display:flex;align-items:center;justify-content:space-between;gap:18px;min-height:44px;margin:6px 0 18px;color:var(--muted);font-size:12px}.chart-toolbar p{margin:0}.chart-toolbar select{font-size:13px;padding:7px 10px;max-width:240px;background:transparent}.section-head{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:22px 0 15px;border-top:1px solid var(--line)}.section-head h2{font-size:20px;font-weight:550;letter-spacing:-.035em;margin:0}.section-head .left{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}.section-head span{font-size:12px;color:var(--muted)}.records{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px 22px;max-height:180px;overflow:auto;overscroll-behavior:auto;padding-bottom:15px;scrollbar-color:#3b5249 transparent;scrollbar-width:thin}.record{min-width:0;padding:12px 0;border-top:1px solid #1d2a25;text-align:left;background:transparent;border-right:0;border-bottom:0;border-left:0;position:relative}.record.active{border-top-color:var(--mint)}.record.active:before{content:"";height:4px;width:4px;background:var(--mint);border-radius:50%;position:absolute;top:-2px;left:0}.record-value{display:flex;align-items:baseline;gap:6px;font-size:28px;letter-spacing:-.04em;line-height:1.2;overflow-wrap:anywhere}.record-value span{font-size:12px;color:var(--muted);letter-spacing:0}.record time{display:block;font-size:12px;color:#d6e1dc;margin:9px 0 3px}.record small{font-size:11px;color:var(--muted);display:block;overflow-wrap:anywhere}.record-empty{grid-column:1/-1;font-size:14px;color:var(--muted);margin:0;padding:7px 0 22px}.photos-section{margin-top:8px}.photos{display:flex;gap:16px;overflow-x:auto;padding:0 0 16px;scroll-snap-type:x proximity;scrollbar-color:#3b5249 transparent;scrollbar-width:thin}.photo-card{margin:0;flex:0 0 200px;scroll-snap-align:start;min-width:0}.photo-image{aspect-ratio:4/5;background:#101816;border:1px solid #1e2c27;border-radius:5px;display:grid;place-items:center;overflow:hidden;position:relative}.photo-image img{width:100%;height:100%;object-fit:contain;position:absolute;inset:0}.photo-image p{font-size:12px;color:var(--muted);text-align:center;padding:15px}.photo-image button{position:relative;z-index:1}.photo-card figcaption{padding:10px 0;font-size:13px}.photo-card small{display:block;color:var(--muted);font-size:11px;margin-top:3px}.photo-empty{width:100%;padding:23px 0 30px;color:var(--muted);font-size:14px;margin:0}.footer{display:flex;justify-content:space-between;gap:18px;color:var(--muted);font-size:11px;padding:22px 0 30px;margin-top:12px}.footer a{color:var(--muted);text-decoration:none}.footer a:hover{color:var(--mint)}dialog{color:var(--ink);background:#101817;border:1px solid #344b40;border-radius:10px;width:min(470px,calc(100% - 28px));padding:28px;max-height:calc(100dvh - 36px);overflow:auto;box-shadow:0 30px 140px #0009}dialog::backdrop{background:#020605b8;backdrop-filter:blur(6px)}.modal-head{display:flex;justify-content:space-between;align-items:center;gap:18px}.modal-head h2{font-size:27px;letter-spacing:-.04em;font-weight:550;margin:0}.close{border:0;background:transparent;color:var(--muted);font-size:26px;padding:0 6px}.modal-copy{color:var(--muted);font-size:14px;margin:8px 0 24px}.field{display:block;min-width:0}.field>span{display:block;margin:0 0 8px;color:#d1ded8;font-size:13px;font-weight:550}.entry fieldset,.photo-form fieldset{border:0;padding:0;margin:22px 0 0;display:grid;gap:18px;min-width:0}.number-fields{display:grid;grid-template-columns:1fr 100px;gap:12px}#value{font-size:34px;height:66px;letter-spacing:-.04em}#unit{height:66px}.primary{border:1px solid var(--mint);border-radius:5px;background:var(--mint);color:#092319;font-weight:650;padding:13px 18px;width:100%;margin-top:2px}.primary:hover{background:#adf7df}.entry-note,.form-footnote,.auth-caption{font-size:12px;line-height:1.6;color:var(--muted);margin:14px 0 0}.message{font-size:13px;margin:10px 0 0;color:var(--muted);overflow-wrap:anywhere}.message:empty{display:none}.message.error{color:var(--error)}.message.success{color:var(--mint)}#connect-form{display:grid;gap:16px}.project-fields{display:grid;gap:16px}.project-settings{border-bottom:1px solid var(--line);padding-bottom:16px}.project-settings summary{font-size:13px;color:var(--blue);cursor:pointer;overflow-wrap:anywhere}.project-settings .project-fields{padding-top:16px}.photo-preview{display:block;width:100%;max-height:250px;object-fit:contain;border-radius:4px}.file-note{font-size:12px;color:var(--muted);margin:7px 0 0}noscript{display:block;padding:20px;color:var(--error)}
+@media(max-width:760px){.wrap{padding:0 24px}.records{grid-template-columns:repeat(3,minmax(0,1fr))}.hero:before{inset:-20px -24px}.hero-top{gap:18px}.latest strong{font-size:54px}.photo-card{flex-basis:180px}}
+@media(max-width:520px){.wrap{padding:0 20px}header{padding:20px 0}.header-right{gap:12px}.status{display:none}.hero{padding-top:24px}.hero-top{margin-bottom:20px;align-items:flex-start}h1{font-size:66px}.eyebrow{font-size:9px}.latest strong{font-size:44px}.latest span{font-size:12px}.point-metric{font-size:12px}.latest-time{font-size:11px;max-width:170px}.chart-area,.chart-empty{min-height:250px}.plot{height:250px}.chart-toolbar{font-size:11px;align-items:flex-start}.chart-toolbar select{max-width:160px}.records{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 20px;max-height:207px}.record-value{font-size:27px}.section-head{padding:19px 0 13px}.section-head .left{gap:8px}.section-head h2{font-size:19px}.section-head span{font-size:11px}.photo-card{flex-basis:168px}.footer{font-size:10px}.hero:before{inset:-20px -20px}dialog{padding:23px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<noscript>This page needs JavaScript to connect to your database.</noscript>
+<div class="wrap">
+<header><div class="brand" aria-label="YOU">YOU<span>.</span></div><div class="header-right"><span class="status" id="connection-status">Your record</span><button class="quiet-button" id="connect-open" type="button">Sign in ↗</button><button class="quiet-button" id="log-open" type="button" hidden>Log weight +</button><button class="text-button" id="sign-out" type="button" hidden>Sign out</button></div></header>
+<main>
+<section class="hero" aria-label="Body history">
+<div class="hero-top"><div><span class="eyebrow">YOUR WIRE</span><h1>BODY.</h1></div><div class="latest-block"><p class="point-metric" id="point-metric">Weight</p><div class="latest"><strong id="point-value">—</strong><span id="point-unit"></span></div><p class="latest-time" id="point-time">Your next reading starts here.</p></div></div>
+<div class="chart-area"><div class="chart-empty" id="chart-empty"><svg class="empty-mark" viewBox="0 0 72 72" aria-hidden="true"><circle cx="36" cy="36" r="31" fill="none" stroke="#365147" stroke-dasharray="2 6"/><circle cx="36" cy="36" r="12" fill="#89ebcb08" stroke="#466757"/><circle cx="36" cy="36" r="3" fill="#89ebcb"/></svg><h2 id="empty-title">One reading starts your line.</h2><p id="empty-copy">Log your weight. Each check-in adds a point here.</p></div><div id="chart-data" hidden><svg id="plot" class="plot" viewBox="0 0 700 300" tabindex="0" role="img" aria-label="Recorded values over time. Use the left and right arrow keys to inspect readings."></svg></div></div>
+<div class="chart-toolbar"><p id="history-subtitle">Weight over time · recorded values</p><label id="history-picker" hidden><select id="history-select" aria-label="Measurement to display"></select></label></div>
+</section>
+<section aria-labelledby="readings-title"><div class="section-head"><div class="left"><h2 id="readings-title">Behind the graph</h2><span id="record-count">Your readings</span></div></div><div class="records" id="records"><p class="record-empty">Sign in to see your readings.</p></div><p class="message" id="history-message" role="status" aria-live="polite"></p><button type="button" class="quiet-button" id="retry-read" hidden>Retry loading</button></section>
+<section class="photos-section" aria-labelledby="photos-title"><div class="section-head"><div class="left"><h2 id="photos-title">Progress photos</h2><span id="photo-count">Optional</span></div><button class="text-button" id="photo-open" type="button">Add photo +</button></div><div class="photos" id="photos"><p class="photo-empty">A visual record, whenever you want to add one.</p></div></section>
+</main>
+<footer class="footer"><span>Every check-in adds to the same record.</span><a href="https://github.com/RowanThistlebrooke/wire-starter" target="_blank" rel="noopener noreferrer">The Wire · Episode 01 ↗</a></footer>
+</div>
+<dialog id="reading-dialog" aria-labelledby="reading-title"><div class="modal-head"><h2 id="reading-title">Log weight.</h2><button class="close" id="reading-close" type="button" aria-label="Close weight form">×</button></div><form class="entry" id="reading-form"><fieldset id="reading-fields" disabled>
+<div class="number-fields"><label class="field"><span>Weight</span><input id="value" type="text" inputmode="decimal" placeholder="—" autocomplete="off" required maxlength="100"></label><label class="field"><span>Unit</span><select id="unit" required><option value="">Choose</option><option value="kg">kg</option><option value="lbs">lbs</option></select></label></div>
+<label class="field"><span>When you weighed in</span><input id="occurred" type="datetime-local" required></label><button class="primary" id="save" type="submit">Save weight ↗</button></fieldset><p class="entry-note" id="entry-note">Your measured weight. Saved to your database.</p><p class="message" id="save-message" role="status" aria-live="polite"></p></form></dialog>
+<dialog id="photo-dialog" aria-labelledby="photo-title"><div class="modal-head"><h2 id="photo-title">Add a progress photo.</h2><button class="close" id="photo-close" type="button" aria-label="Close photo form">×</button></div><form class="photo-form" id="photo-form"><fieldset id="photo-fields"><label class="field"><span>Photo</span><input id="photo-file" type="file" accept="image/jpeg,image/png,image/webp" required><p class="file-note">JPG, PNG or WebP · up to 6 MB</p></label><img id="photo-preview" class="photo-preview" alt="Photo you selected to upload" hidden><label class="field"><span>When it was taken</span><input id="photo-occurred" type="datetime-local" required></label><button class="primary" type="submit">Save photo ↗</button></fieldset><p class="form-footnote">Stored privately in your database’s photo storage. Photos don’t change your weight graph.</p><p class="message" id="photo-message" role="status" aria-live="polite"></p></form></dialog>
+<dialog id="connection-dialog" aria-labelledby="connect-title"><div class="modal-head"><h2 id="connect-title">Sign in.</h2><button class="close" id="connect-close" type="button" aria-label="Close sign-in">×</button></div><p class="modal-copy">Your readings, in your database.</p>
+<form id="connect-form">
+<label class="field"><span>Email</span><input id="email" type="email" autocomplete="username" required></label><label class="field"><span>Password</span><input id="password" type="password" autocomplete="current-password" required></label><p class="auth-caption">Use the login you created in Supabase → Authentication → Users.</p><button class="primary" id="connect-submit" type="submit">Sign in ↗</button><p class="message" id="connect-message" role="status"></p>
+</form></dialog>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/dist/umd/supabase.js"></script>
+<script>
+
+'use strict';
+// One HTML page. Supabase stores the record; this browser only displays it.
+const $ = id => document.getElementById(id);
+const escapeHTML = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const displayName = value => value.replace(/_/g,' ');
+const stamp = value => new Date(value).toLocaleString([], {month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'});
+const seriesKey = row => JSON.stringify([row.metric,row.unit || '']);
+const sourceName = source => ({pad:'Page',you:'You',manual:'Manual',claude:'MCP',shortcut:'Shortcut',photo:'Photo estimate'}[source] || source);
+const PHOTO_BUCKET='body-progress', PHOTO_LIMIT=6*1024*1024;
+let intent=new URLSearchParams(location.search).get('log')==='weight'?'weight':'', photoPending=null, previewUrl='', photoSignature='', photoObserver=null;
+const photoUrls=new Map();
+let photoRevision=0,historyLoading=0,historySignature='';
+let client = null, authSubscription = null, user = null, rows = [], groups = new Map(), selected = '', generation = 0, request = 0, busy = false, pending = null, plotPoints = [], activePoint = -1;
+let connectionPromise = null;
+function message(id,text,kind=''){ $(id).textContent = text; $(id).className = 'message' + (kind ? ' '+kind : ''); }
+function localNow(){ const date = new Date(); return new Date(date.getTime()-date.getTimezoneOffset()*60000).toISOString().slice(0,16); }
+$('occurred').value = localNow();
+$('photo-occurred').value=localNow();
+function projectConfig(value){
+  const url = typeof value?.url==='string'?value.url.trim().replace(/\/$/,''):'', key = typeof value?.key==='string'?value.key.trim():'';
+  if (!/^https:\/\/[a-z0-9-]+\.supabase\.co$/.test(url) || !/^sb_publishable_[A-Za-z0-9_-]+$/.test(key)) throw new Error('This BODY page needs its Supabase connection set up in Vercel.');
+  return {url,key};
+}
+async function connectDatabase(){
+  if(client)return client;
+  if(connectionPromise)return connectionPromise;
+  connectionPromise=(async()=>{
+    let response;
+    try{ response=await fetch('/api/config',{cache:'no-store'}); }
+    catch{ throw new Error('Could not connect to BODY. Check your internet connection and try signing in again.'); }
+    if(!response.ok)throw new Error('This BODY page needs its Supabase connection set up in Vercel.');
+    let config;
+    try{ config=projectConfig(await response.json()); }
+    catch{ throw new Error('This BODY page needs its Supabase connection set up in Vercel.'); }
+    return makeClient(config);
+  })();
+  try{return await connectionPromise;}finally{connectionPromise=null;}
+}
+function showConnection(){ $('connection-dialog').showModal(); $('email').focus(); }
+$('connect-open').onclick = showConnection;
+$('connect-close').onclick = () => { if(!busy)$('connection-dialog').close(); };
+function resetView(){
+  historySignature=''; rows=[]; groups=new Map(); selected=''; plotPoints=[]; activePoint=-1;
+  $('history-picker').hidden=true; $('chart-data').hidden=true; $('chart-empty').hidden=false;
+  $('empty-title').textContent='One reading starts your line.';
+  $('empty-copy').textContent='Log your weight. Each check-in adds a point here.';
+  $('point-metric').textContent='Weight'; $('point-value').textContent='—'; $('point-unit').textContent=''; $('point-time').textContent='Your next reading starts here.';
+  $('records').innerHTML='<p class="record-empty">Sign in to see your readings.</p>';
+  $('record-count').textContent='Your readings';
+  $('history-subtitle').textContent='Weight over time · recorded values'; $('retry-read').hidden=true;
+  clearPhotos(); message('history-message','');
+}
+function openInput(kind){
+  intent=kind;
+  if(!user){ showConnection(); return; }
+  intent='';
+  if(kind==='photo'){ if(!photoPending && !$('photo-file').files.length)$('photo-occurred').value=localNow(); $('photo-dialog').showModal(); }
+  else { if(!pending && !$('value').value)$('occurred').value=localNow(); $('reading-dialog').showModal(); $('value').focus(); }
+}
+$('log-open').onclick=()=>openInput('weight');
+$('photo-open').onclick=()=>openInput('photo');
+$('reading-close').onclick=()=>{ if(!busy)$('reading-dialog').close(); };
+$('photo-close').onclick=()=>{ if(!busy)$('photo-dialog').close(); };
+for(const id of ['reading-dialog','photo-dialog','connection-dialog']) $(id).addEventListener('cancel',event=>{if(busy)event.preventDefault();});
+function finishIntent(){ if(intent && user && !$('connection-dialog').open)openInput(intent); }
+function setUser(next){
+  if (next?.id === user?.id) return;
+  user=next; generation++; request++; pending=null; photoPending=null; resetView(); resetPhotoForm(); $('value').value=''; $('unit').value='';
+  $('reading-fields').disabled=!user; $('connect-open').hidden=!!user; $('sign-out').hidden=!user; $('log-open').hidden=!user;
+  $('connection-status').textContent=user ? 'Connected' : 'Your record';
+  $('connection-status').classList.toggle('connected',!!user);
+  $('entry-note').textContent='Your measured weight. Saved to your database.';
+  message('save-message','');
+  if (!user){ $('value').value=''; $('unit').value=''; $('reading-dialog').close(); $('photo-dialog').close(); resetPhotoForm(); }
+  else { $('occurred').value=localNow(); loadHistory(); finishIntent(); }
+}
+function makeClient(config){
+  if (!window.supabase) throw new Error('The connection library could not load. Check your internet connection and reload.');
+  authSubscription?.unsubscribe(); client?.auth.stopAutoRefresh();
+  const storageKey='wire-starter.auth.'+new URL(config.url).hostname;
+  client=supabase.createClient(config.url,config.key,{auth:{storage:sessionStorage,storageKey,persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
+  const thisClient=client;
+  authSubscription=client.auth.onAuthStateChange((_event,session) => {
+    // Keep the auth callback synchronous; defer database requests outside its lock.
+    setTimeout(() => { if (client===thisClient) setUser(session?.user || null); },0);
+  }).data.subscription;
+  return client;
+}
+$('connect-form').addEventListener('submit',async event => {
+  event.preventDefault(); if (busy) return;
+  busy=true; $('connect-submit').disabled=true; message('connect-message','Signing in…');
+  try {
+    const db=await connectDatabase(); message('history-message','');
+    const {data,error}=await db.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});
+    if (error) throw error;
+    if (!data.user) throw new Error('Sign-in did not return a user. Please try again.');
+    $('password').value='';
+    setUser(data.user); $('connection-dialog').close(); message('connect-message',''); finishIntent();
+  } catch(error){ message('connect-message',error.message || 'Could not sign in. Check your email and password.','error'); }
+  finally { busy=false; $('connect-submit').disabled=false; }
+});
+$('sign-out').onclick=async () => {
+  if (!client || busy) return;
+  busy=true; $('sign-out').disabled=true; $('reading-fields').disabled=true;
+  try {
+    const {error}=await client.auth.signOut({scope:'local'});
+    if(error) throw error;
+    setUser(null);
+  } catch(error){ message('history-message',error.message || 'Could not sign out. Please retry.','error'); }
+  finally { busy=false; $('sign-out').disabled=false; $('reading-fields').disabled=!user; }
+};
+// Read every page, even if the server caps a request below our requested size.
+// A failed page throws; partial history is never presented as complete.
+async function readAll(make){
+  const all=[]; let from=0;
+  for(;;){
+    const {data,error,count}=await make().range(from,from+999);
+    if(error) throw error;
+    if(!Array.isArray(data) || !Number.isSafeInteger(count) || count<0) throw new Error('The full history could not be confirmed. Please retry.');
+    all.push(...data); from+=data.length;
+    if(from>=count) return all;
+    if(!data.length) throw new Error('The history stopped before every reading was returned. Please retry.');
+  }
+}
+async function loadHistory(preferred=''){
+  if (!client || !user) return false;
+  const db=client, who=user.id, version=generation, thisRequest=++request; historyLoading++;
+  message('history-message','Loading your record…'); $('retry-read').hidden=true;
+  try {
+    const result=await readAll(() => db.from('events').select('id,metric,value::text,unit,occurred_at,recorded_at,source,event_type,context',{count:'exact'})
+      .eq('user_id',who).in('event_type',['measurement','progress_photo'])
+      .order('recorded_at',{ascending:true}).order('id',{ascending:true}));
+    if(version!==generation || thisRequest!==request) return false;
+    const signature=JSON.stringify(result);
+    if(signature===historySignature && !preferred){ message('history-message',''); return true; }
+    historySignature=signature;
+    rows=result.filter(row=>row.event_type==='measurement' && row.value!==null && (row.metric==='weight' || row.context?.area==='body')); groups=new Map();
+    for(const row of rows){ const key=seriesKey(row); if(!groups.has(key)) groups.set(key,[]); groups.get(key).push(row); }
+    for(const group of groups.values()) group.sort((a,b) => a.occurred_at.localeCompare(b.occurred_at) || a.id.localeCompare(b.id));
+    if(preferred && groups.has(preferred)) selected=preferred;
+    if(!groups.has(selected)){ const weight=rows.filter(row=>row.metric==='weight'); selected=weight.length?seriesKey(weight.at(-1)):rows.length?seriesKey(rows.at(-1)):''; }
+    $('history-select').innerHTML=[...groups].sort((a,b)=>a[1][0].metric.localeCompare(b[1][0].metric)).map(([key,group])=>`<option value="${escapeHTML(key)}"${key===selected?' selected':''}>${escapeHTML(displayName(group[0].metric))}${group[0].unit?' · '+escapeHTML(group[0].unit):' · no unit'}</option>`).join('');
+    $('history-picker').hidden=groups.size<2; drawHistory(); drawPhotos(result.filter(row=>row.event_type==='progress_photo' && row.metric==='body_progress')); message('history-message',''); return true;
+  } catch(error){
+    if(version!==generation || thisRequest!==request) return false;
+    historySignature=''; rows=[]; groups=new Map(); plotPoints=[]; clearPhotos(); $('point-value').textContent='—'; $('point-unit').textContent=''; $('point-time').textContent='History unavailable'; $('history-picker').hidden=true; $('chart-data').hidden=true; $('chart-empty').hidden=false;
+    $('empty-title').textContent='Your record could not load.'; $('empty-copy').textContent='Retry to read your saved history.';
+    $('records').innerHTML=''; $('record-count').textContent='History unavailable'; $('photos').innerHTML='<p class="photo-empty">Photo history could not load. Retry the record above.</p>';
+    message('history-message',error.message || 'Could not load every reading.','error'); $('retry-read').hidden=false; return false;
+  } finally { historyLoading--; }
+}
+$('retry-read').onclick=()=>loadHistory();
+$('history-select').onchange=event=>{selected=event.target.value;drawHistory();};
+function drawHistory(){
+  const group=groups.get(selected) || [];
+  $('chart-empty').hidden=!!group.length; $('chart-data').hidden=!group.length;
+  if(!group.length){
+    $('point-metric').textContent='Weight'; $('point-value').textContent='—'; $('point-unit').textContent=''; $('point-time').textContent='Your next reading starts here.';
+    $('empty-title').textContent='One reading starts your line.'; $('empty-copy').textContent='Log your weight. Each check-in adds a point here.';
+    $('records').innerHTML='<p class="record-empty">Your weigh-ins will appear here, with their date and source.</p>'; $('record-count').textContent='No readings yet';
+    $('history-subtitle').textContent='Weight over time · recorded values'; return;
+  }
+  $('point-metric').textContent=displayName(group[0].metric)+(group[0].metric.endsWith('_est')?' · estimate':'');
+  $('history-subtitle').textContent=displayName(group[0].metric)+' over time · '+(group[0].unit || 'no unit recorded');
+  $('record-count').textContent=group.length+' reading'+(group.length===1?'':'s');
+  $('records').innerHTML=[...group].reverse().map((row,i)=>`<button type="button" class="record" data-reading="${group.length-1-i}" aria-label="Inspect ${escapeHTML(row.value)} ${escapeHTML(row.unit)} recorded ${escapeHTML(stamp(row.occurred_at))}"><div class="record-value">${escapeHTML(row.value)}<span>${escapeHTML(row.unit)}</span></div><time datetime="${escapeHTML(row.occurred_at)}">${escapeHTML(stamp(row.occurred_at))}</time><small>${escapeHTML(sourceName(row.source))} · saved ${escapeHTML(new Date(row.recorded_at).toLocaleDateString([],{month:'short',day:'numeric'}))}</small></button>`).join('');
+  drawPlot(group);
+}
+$('records').addEventListener('click',event=>{ const row=event.target.closest('[data-reading]'); if(row)inspectPoint(Number(row.dataset.reading)); });
+// Compare decimal identities before converting them into chart coordinates.
+function decimalIdentity(value){
+  const match=String(value).trim().toLowerCase().match(/^([+-]?)(\d*)(?:\.(\d*))?(?:e([+-]?\d+))?$/);
+  if(!match || !(match[2] || match[3])) return null;
+  let digits=(match[2]+(match[3] || '')).replace(/^0+/,'');
+  if(!digits) return '0';
+  let exponent=Number(match[4] || 0)-(match[3] || '').length;
+  while(digits.endsWith('0')){ digits=digits.slice(0,-1); exponent++; }
+  return (match[1]==='-'?'-':'')+digits+'e'+exponent;
+}
+function drawPlot(group){
+  // Stored values stay exact strings. Never hide points that cannot be plotted.
+  const W=Math.max(280,$('plot').clientWidth || 700),H=$('plot').clientHeight || 300,L=14,R=14,T=35,B=36;
+  $('plot').setAttribute('viewBox',`0 0 ${W} ${H}`);
+  plotPoints=[]; activePoint=-1;
+  if(group.some(row=>!Number.isFinite(Number(row.value)) || !Number.isFinite(Date.parse(row.occurred_at)) || decimalIdentity(row.value)!==decimalIdentity(String(Number(row.value))))){
+    $('plot').innerHTML=`<text x="${W/2}" y="100" text-anchor="middle">This scale exceeds chart precision.</text><text x="${W/2}" y="120" text-anchor="middle">Exact saved values are listed below.</text>`;
+    showPoint(group.at(-1)); return;
+  }
+  const candidates=group; plotPoints=candidates; activePoint=candidates.length-1;
+  let minimum=candidates[0],maximum=minimum;
+  for(const row of candidates){ if(Number(row.value)<Number(minimum.value))minimum=row; if(Number(row.value)>Number(maximum.value))maximum=row; }
+  // Normalize first so even opposite, very large values have a finite range.
+  const magnitude=Math.max(Math.abs(Number(minimum.value)),Math.abs(Number(maximum.value))) || 1;
+  let low=Number(minimum.value)/magnitude,high=Number(maximum.value)/magnitude;
+  const span=high-low, padding=span ? span*.16 : .1;
+  low-=padding; high+=padding;
+  const from=Date.parse(candidates[0].occurred_at),to=Date.parse(candidates.at(-1).occurred_at);
+  const x=row=>from===to?W/2:L+(Date.parse(row.occurred_at)-from)/(to-from)*(W-L-R);
+  const y=row=>T+(high-Number(row.value)/magnitude)/(high-low)*(H-T-B);
+  let lines='',previous=null,hasGap=false,fills='',run=[];
+  const finishRun=()=>{ if(run.length>1)fills+=`<path d="M${run[0].plotX} ${H-B} ${run.map(row=>'L'+row.plotX+' '+row.plotY).join(' ')} L${run.at(-1).plotX} ${H-B}Z" fill="url(#chart-wash)"/>`; run=[]; };
+  for(const row of candidates){
+    row.plotX=x(row); row.plotY=y(row);
+    if(previous){
+      const gap=Date.parse(row.occurred_at)-Date.parse(previous.occurred_at)>86400000; hasGap ||= gap; if(gap)finishRun();
+      lines+=`<path d="M${previous.plotX} ${previous.plotY}L${row.plotX} ${row.plotY}" fill="none" stroke="${gap?'#7e9b90':'#89ebcb'}" stroke-width="2"${gap?' stroke-dasharray="4 6"':''}/>`;
+    }
+    run.push(row); previous=row;
+  }
+  finishRun();
+  const dateLabel=row=>new Date(row.occurred_at).toLocaleDateString([],{month:'short',day:'numeric'});
+  const axisLabel=row=>String(row.value).length<=12?row.value:Number(row.value).toExponential(3);
+  $('plot').innerHTML=`<defs><linearGradient id="chart-wash" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#89ebcb" stop-opacity=".13"/><stop offset="1" stop-color="#89ebcb" stop-opacity="0"/></linearGradient></defs>${fills}<line x1="${L}" x2="${W-R}" y1="${H-B}" y2="${H-B}" stroke="#263b31"/><line x1="${L}" x2="${W-R}" y1="${(H-B+T)/2}" y2="${(H-B+T)/2}" stroke="#1f3029" stroke-dasharray="2 7"/><text x="${L}" y="12">${escapeHTML(axisLabel(maximum))}${minimum!==maximum?' / '+escapeHTML(axisLabel(minimum))+' range':''}</text>${hasGap?`<text x="${W-R}" y="12" text-anchor="end">— — over 24h apart</text>`:''}${lines}${candidates.map((row,i)=>`<circle data-point="${i}" cx="${row.plotX}" cy="${row.plotY}" r="3.5" fill="#89ebcb"><title>${escapeHTML(row.value)} ${escapeHTML(row.unit)} · ${escapeHTML(stamp(row.occurred_at))}</title></circle>`).join('')}<text x="${L}" y="${H-6}">${escapeHTML(dateLabel(candidates[0]))}</text>${from!==to?`<text x="${W-R}" y="${H-6}" text-anchor="end">${escapeHTML(dateLabel(candidates.at(-1)))}</text>`:''}<g id="plot-focus"></g>`;
+  inspectPoint(activePoint);
+}
+let resizeFrame;
+new ResizeObserver(()=>{ cancelAnimationFrame(resizeFrame); resizeFrame=requestAnimationFrame(()=>{ const group=groups.get(selected); if(group?.length){ const previous=activePoint; drawPlot(group); inspectPoint(previous); } }); }).observe($('plot'));
+function showPoint(row){ $('point-value').textContent=row.value; $('point-unit').textContent=row.unit || ''; $('point-time').textContent='Read '+stamp(row.occurred_at); }
+function inspectPoint(index){
+  if(!plotPoints.length) return; activePoint=Math.max(0,Math.min(plotPoints.length-1,index)); const row=plotPoints[activePoint]; showPoint(row);
+  document.querySelectorAll('[data-reading]').forEach(element=>element.classList.toggle('active',Number(element.dataset.reading)===activePoint));
+  const focus=$('plot-focus'); if(focus) focus.innerHTML=`<circle class="focus-ring" cx="${row.plotX}" cy="${row.plotY}" r="5"/><circle cx="${row.plotX}" cy="${row.plotY}" r="3.5" fill="#b5fce3"/>`;
+}
+function inspectPointer(event){
+  if(!plotPoints.length) return; const matrix=$('plot').getScreenCTM(); if(!matrix)return;
+  const px=new DOMPoint(event.clientX,event.clientY).matrixTransform(matrix.inverse()).x;
+  let nearest=0;for(let i=1;i<plotPoints.length;i++) if(Math.abs(plotPoints[i].plotX-px)<Math.abs(plotPoints[nearest].plotX-px)) nearest=i;
+  inspectPoint(nearest);
+}
+$('plot').addEventListener('pointermove',inspectPointer);$('plot').addEventListener('pointerdown',inspectPointer);
+$('plot').addEventListener('keydown',event=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;event.preventDefault();inspectPoint(event.key==='Home'?0:event.key==='End'?plotPoints.length-1:activePoint+(event.key==='ArrowRight'?1:-1));});
+function readingDraft(){
+  const value=$('value').value.trim(),unit=$('unit').value,when=$('occurred').value;
+  if(!/^[+]?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?$/i.test(value) || !Number.isFinite(Number(value)) || Number(value)<=0) throw new Error('Enter your measured weight as a number greater than zero.');
+  if(!['kg','lbs'].includes(unit)) throw new Error('Choose kg or lbs.');
+  const time=readingTime(when);
+  return {metric:'weight',value,unit,occurred_at:time,context:{area:'body',schema_version:1}};
+}
+function readingTime(value){
+  const time=new Date(value); if(!value || !Number.isFinite(time.getTime())) throw new Error('Choose when this happened.');
+  if(time.getTime()>Date.now()+60000) throw new Error('Use the time this happened, rather than a future time.');
+  return time.toISOString();
+}
+$('reading-form').addEventListener('submit',async event=>{
+  event.preventDefault();if(!user || !client || busy)return;
+  let draft;try{draft=readingDraft();}catch(error){message('save-message',error.message,'error');return;}
+  const fingerprint=JSON.stringify(draft),who=user.id,version=generation,db=client;
+  if(!pending || pending.fingerprint!==fingerprint || pending.userId!==who) pending={fingerprint,userId:who,id:crypto.randomUUID()};
+  const sourceId=pending.id;
+  busy=true; $('reading-fields').disabled=true; $('sign-out').disabled=true; message('save-message','Saving…');
+  try{
+    const {error}=await db.from('events').insert({...draft,user_id:who,source:'pad',source_id:sourceId,event_type:'measurement'});
+    // On an uncertain network result the same draft keeps its UUID. Confirm a
+    // duplicate by reading that exact saved row; never turn a retry into a new reading.
+    if(error){
+      if(error.code!=='23505') throw error;
+      const {data,error:readError}=await db.from('events').select('id').eq('user_id',who).eq('source','pad').eq('source_id',sourceId).eq('metric',draft.metric).maybeSingle();
+      if(readError || !data) throw readError || error;
+    }
+    if(version!==generation)return;
+    pending=null; $('value').value=''; $('occurred').value=localNow();
+    const loaded=await loadHistory(seriesKey(draft));
+    if(version===generation){ message('save-message',loaded?'Saved. It’s in your record.':'Saved. History could not refresh; use Retry loading.','success'); $('reading-dialog').close(); }
+  }catch(error){if(version===generation)message('save-message',(error.message || 'Save could not be confirmed.')+' Retry the same reading to avoid a duplicate.','error');}
+  finally{busy=false;$('reading-fields').disabled=!user;$('sign-out').disabled=false;}
+});
+function clearPhotos(){
+  photoRevision++;
+  photoObserver?.disconnect(); photoObserver=null; photoSignature='';
+  for(const url of photoUrls.values())URL.revokeObjectURL(url); photoUrls.clear();
+  $('photos').innerHTML='<p class="photo-empty">A visual record, whenever you want to add one.</p>'; $('photo-count').textContent='Optional';
+}
+function resetPhotoForm(){
+  if(previewUrl)URL.revokeObjectURL(previewUrl); previewUrl='';
+  $('photo-preview').removeAttribute('src'); $('photo-preview').hidden=true;
+  $('photo-file').value=''; $('photo-occurred').value=localNow(); message('photo-message','');
+}
+function photoFile(){
+  const file=$('photo-file').files[0];
+  if(!file)throw new Error('Choose a photo.');
+  if(!['image/jpeg','image/png','image/webp'].includes(file.type))throw new Error('Use a JPG, PNG or WebP image. Export HEIC as JPEG first.');
+  if(!file.size || file.size>PHOTO_LIMIT)throw new Error('Choose a photo no larger than 6 MB.');
+  return file;
+}
+$('photo-file').addEventListener('change',()=>{
+  if(previewUrl)URL.revokeObjectURL(previewUrl); previewUrl=''; $('photo-preview').hidden=true; $('photo-preview').removeAttribute('src');
+  try{ const file=photoFile(); previewUrl=URL.createObjectURL(file); $('photo-preview').src=previewUrl; $('photo-preview').hidden=false; message('photo-message',''); }
+  catch(error){ message('photo-message',error.message,'error'); }
+});
+function validPhoto(row,who){
+  const context=row.context || {};
+  return context.bucket===PHOTO_BUCKET && typeof context.path==='string' && context.path.startsWith(who+'/') && /^[a-f0-9-]+\/(?:[a-f0-9-]+)\.(?:jpg|png|webp)$/i.test(context.path);
+}
+function drawPhotos(photos){
+  const ordered=[...photos].sort((a,b)=>b.occurred_at.localeCompare(a.occurred_at) || b.id.localeCompare(a.id));
+  const signature=JSON.stringify(ordered.map(row=>[row.id,row.occurred_at,row.context?.path]));
+  if(signature===photoSignature)return;
+  clearPhotos(); photoSignature=signature;
+  if(!ordered.length)return;
+  $('photo-count').textContent=ordered.length+' photo'+(ordered.length===1?'':'s');
+  const who=user.id,db=client,version=generation,revision=photoRevision;
+  $('photos').innerHTML=ordered.map((row,index)=>`<figure class="photo-card" data-photo="${index}"><div class="photo-image"><p>Loading private photo…</p><img alt="Progress photo taken ${escapeHTML(stamp(row.occurred_at))}" hidden></div><figcaption>${escapeHTML(stamp(row.occurred_at))}<small>${escapeHTML(sourceName(row.source))} · saved ${escapeHTML(new Date(row.recorded_at).toLocaleDateString([],{month:'short',day:'numeric'}))}</small></figcaption></figure>`).join('');
+  const load=async card=>{
+    if(version!==generation || revision!==photoRevision)return;
+    const row=ordered[Number(card.dataset.photo)],placeholder=card.querySelector('.photo-image');
+    if(!validPhoto(row,who)){placeholder.innerHTML='<p>This photo has an unsupported storage reference.</p>';return;}
+    try{
+      const {data,error}=await db.storage.from(PHOTO_BUCKET).download(row.context.path);
+      if(error)throw error;
+      if(version!==generation || revision!==photoRevision || photoSignature!==signature)return;
+      if(!data || !['image/jpeg','image/png','image/webp'].includes(data.type) || data.size>PHOTO_LIMIT)throw new Error('Unsupported photo format.');
+      const url=URL.createObjectURL(data); photoUrls.set(row.id,url);
+      const img=card.querySelector('img'); img.src=url; img.hidden=false; placeholder.querySelector('p')?.remove();
+      img.onerror=()=>{ URL.revokeObjectURL(url); if(photoUrls.get(row.id)===url)photoUrls.delete(row.id); if(version!==generation || revision!==photoRevision)return; placeholder.innerHTML='<p>This file could not be displayed.</p>'; };
+    }catch(error){
+      if(version!==generation || revision!==photoRevision || photoSignature!==signature)return;
+      placeholder.innerHTML='<p>Photo could not load.</p><button type="button" class="text-button">Retry</button>';
+      placeholder.querySelector('button').onclick=()=>{placeholder.innerHTML='<p>Loading private photo…</p><img alt="Saved progress photo" hidden>';load(card);};
+    }
+  };
+  const observer=new IntersectionObserver(entries=>{if(version!==generation || revision!==photoRevision)return; for(const entry of entries)if(entry.isIntersecting){observer.unobserve(entry.target);load(entry.target);}}, {root:$('photos'),rootMargin:'120px'});
+  photoObserver=observer; $('photos').querySelectorAll('[data-photo]').forEach(card=>observer.observe(card));
+}
+async function fileHash(file){ return [...new Uint8Array(await crypto.subtle.digest('SHA-256',await file.arrayBuffer()))].map(byte=>byte.toString(16).padStart(2,'0')).join(''); }
+$('photo-form').addEventListener('submit',async event=>{
+  event.preventDefault(); if(!user || !client || busy)return;
+  let file,occurred;try{file=photoFile();occurred=readingTime($('photo-occurred').value);}catch(error){message('photo-message',error.message,'error');return;}
+  const db=client,who=user.id,version=generation;
+  busy=true; $('photo-fields').disabled=true; $('sign-out').disabled=true; message('photo-message','Saving your private photo…');
+  try{
+    const sha256=await fileHash(file),fingerprint=JSON.stringify([who,sha256,occurred]);
+    if(version!==generation)return;
+    if(!photoPending || photoPending.fingerprint!==fingerprint){
+      const id=crypto.randomUUID(),extension={'image/jpeg':'jpg','image/png':'png','image/webp':'webp'}[file.type];
+      photoPending={fingerprint,id,path:who+'/'+id+'.'+extension,uploaded:false};
+    }
+    const pendingPhoto=photoPending;
+    if(!pendingPhoto.uploaded){
+      const {error}=await db.storage.from(PHOTO_BUCKET).upload(pendingPhoto.path,file,{upsert:false,contentType:file.type});
+      if(error){
+        if(!/duplicate|already exists/i.test([error.message,error.error,error.code].join(' ')))throw error;
+        // A retry may find an uploaded object. Verify its bytes before adding the row.
+        const existing=await db.storage.from(PHOTO_BUCKET).download(pendingPhoto.path);
+        if(existing.error)throw existing.error;
+        if(!existing.data || await fileHash(existing.data)!==sha256)throw new Error('The existing upload does not match this photo.');
+      }
+      pendingPhoto.uploaded=true;
+    }
+    if(version!==generation)return;
+    const context={area:'body',schema_version:1,bucket:PHOTO_BUCKET,path:pendingPhoto.path,mime_type:file.type,bytes:file.size,sha256};
+    const {error}=await db.from('events').insert({user_id:who,metric:'body_progress',value:null,unit:null,event_type:'progress_photo',source:'pad',source_id:pendingPhoto.id,occurred_at:occurred,context});
+    if(error){
+      if(error.code!=='23505')throw error;
+      const existing=await db.from('events').select('context').eq('user_id',who).eq('source','pad').eq('source_id',pendingPhoto.id).eq('metric','body_progress').maybeSingle();
+      if(existing.error || existing.data?.context?.sha256!==sha256 || existing.data?.context?.path!==pendingPhoto.path)throw existing.error || error;
+    }
+    if(version!==generation)return;
+    photoPending=null; resetPhotoForm(); await loadHistory();
+    if(version===generation)$('photo-dialog').close();
+  }catch(error){
+    if(version===generation){
+      const text=/bucket.*not found|row.level security|not authorized/i.test(error.message || '')?'Photo storage needs setup. Run photos.sql from this repo in your Supabase SQL Editor, then retry.':(error.message || 'Photo save could not be confirmed.')+' Retry this same photo to continue.';
+      message('photo-message',text,'error');
+    }
+  }finally{busy=false;$('photo-fields').disabled=false;$('sign-out').disabled=false;}
+});
+// External inputs appear on returning to the page and while the page is visible.
+function refreshWhenVisible(){ if(user && !busy && !historyLoading && document.visibilityState==='visible')loadHistory(); }
+window.addEventListener('focus',refreshWhenVisible);
+document.addEventListener('visibilitychange',refreshWhenVisible);
+setInterval(refreshWhenVisible,30000);
+
+// Deployment provides public settings; restore only this tab's signed-in session.
+(async()=>{
+  try{
+    const db=await connectDatabase(),version=generation;
+    const {data,error}=await db.auth.getSession();if(error)throw error;
+    if(client===db && version===generation)setUser(data.session?.user || null);
+  }catch(error){message('history-message',error.message || 'Sign in to open your Wire.','error');}
+  finally{ if(intent && !user)showConnection(); }
+})();
+
+</script>
+</body>
+</html>
