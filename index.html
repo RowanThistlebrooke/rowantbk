@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#080c0d">
-<title>BODY · Your Wire</title>
+<title>BODY · Your space</title>
 <style>
 
 :root{color-scheme:dark;--bg:#080c0d;--ink:#eef4f2;--muted:#a5b6b2;--line:#263532;--mint:#89ebcb;--blue:#a6caff;--error:#ffae9f;--sans:Inter,"Helvetica Neue",Arial,sans-serif;--mono:ui-monospace,SFMono-Regular,Consolas,monospace}
@@ -12,22 +12,28 @@
 @media(max-width:760px){.wrap{padding:0 24px}.records{grid-template-columns:repeat(3,minmax(0,1fr))}.hero:before{inset:-20px -24px}.hero-top{gap:18px}.latest strong{font-size:54px}.photo-card{flex-basis:180px}}
 @media(max-width:520px){.wrap{padding:0 20px}header{padding:20px 0}.header-right{gap:12px}.status{display:none}.hero{padding-top:24px}.hero-top{margin-bottom:20px;align-items:flex-start}h1{font-size:66px}.eyebrow{font-size:9px}.latest strong{font-size:44px}.latest span{font-size:12px}.point-metric{font-size:12px}.latest-time{font-size:11px;max-width:170px}.chart-area,.chart-empty{min-height:250px}.plot{height:250px}.chart-toolbar{font-size:11px;align-items:flex-start}.chart-toolbar select{max-width:160px}.records{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 20px;max-height:207px}.record-value{font-size:27px}.section-head{padding:19px 0 13px}.section-head .left{gap:8px}.section-head h2{font-size:19px}.section-head span{font-size:11px}.photo-card{flex-basis:168px}.footer{font-size:10px}.hero:before{inset:-20px -20px}dialog{padding:23px}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+.workspace{min-height:100dvh;padding-left:224px}.sidebar{position:fixed;inset:0 auto 0 0;width:224px;padding:26px 24px;background:linear-gradient(165deg,#10201b70,transparent 55%);border-right:1px solid #22302b;z-index:2}.sidebar .brand{font-size:35px}.nav-label{margin:57px 0 18px;font:11px var(--mono);letter-spacing:.15em;color:var(--muted)}.area-link{display:flex;align-items:center;justify-content:space-between;gap:12px;text-decoration:none;padding:17px 12px;margin:0 -12px;border-radius:6px;background:linear-gradient(110deg,#89ebcb13,transparent);color:var(--ink)}.area-name{font-size:19px;font-weight:650;display:flex;align-items:center;gap:10px}.area-name svg{width:17px;height:22px;color:var(--mint)}.area-link strong{font-size:29px;font-weight:550;letter-spacing:-.06em}.area-link strong.pos{color:var(--mint)}.area-link strong.neg{color:var(--error)}.index-meta{display:flex;justify-content:space-between;gap:8px;font-size:11px;color:var(--muted);padding:12px 0 0}.index-meta span:last-child{color:var(--ink)}.index-state{font-size:12px;line-height:1.5;color:var(--muted);margin:9px 0 4px;overflow-wrap:anywhere}.baseline-button{font-size:12px;color:var(--mint);border:0;padding:8px 0;background:none;text-align:left}.workspace>.wrap{max-width:1360px;padding:0 44px 28px}.overview-label{font-size:13px;color:var(--muted)}.hero{padding-top:31px}#body{scroll-margin-top:22px}.baseline-copy{font-size:14px;color:var(--muted);margin:10px 0 22px}.baseline-rules{display:grid;gap:20px;margin-bottom:22px}.baseline-rule{padding-top:15px;border-top:1px solid var(--line)}.baseline-rule-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:10px}.baseline-rule-head strong{font-size:15px;font-weight:600;text-transform:capitalize}.baseline-rule-head span{font-size:12px;color:var(--muted)}.baseline-rule select{font-size:14px}.baseline-band{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}.baseline-band label{font-size:12px;color:var(--muted)}.baseline-band input{margin-top:5px}.baseline-note{font-size:12px;color:var(--muted);margin:12px 0 0}.photo-card{position:relative}.photo-remove{margin:0 0 4px;padding:5px 0;font-size:12px}.photo-remove:hover{color:var(--error)}.removed-photos{border-top:1px solid var(--line);margin-top:14px;padding:14px 0}.removed-photos summary{font-size:13px;color:var(--muted);cursor:pointer}.removed-photo-note{font-size:12px;color:var(--muted);margin:10px 0}.removed-photo-row{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:12px 0;border-bottom:1px solid #1d2a25;font-size:13px}.removed-photo-row time{color:var(--muted)}#removed-photo-list{max-height:190px;overflow:auto}#photo-undo,#photo-action-retry{margin:5px 16px 4px 0}
+@media(max-width:1000px){.workspace{padding-left:195px}.sidebar{width:195px;padding:26px 20px}.workspace>.wrap{padding-left:28px;padding-right:28px}.area-link strong{font-size:26px}.index-meta{font-size:11px}.hero:before{inset:-40px -28px -20px}}
+@media(max-width:760px){.workspace{padding-left:0}.sidebar{position:static;width:100%;padding:18px 24px;display:flex;align-items:center;gap:28px;border-right:0;border-bottom:1px solid #22302b}.sidebar .brand{font-size:29px}.sidebar nav{display:grid;grid-template-columns:1fr auto;align-items:center;column-gap:18px;width:100%}.nav-label,.index-meta span:first-child{display:none}.area-link{background:none;margin:0;padding:0;gap:16px;grid-row:1/3}.area-name{font-size:16px;gap:7px}.area-name svg{display:none}.area-link strong{font-size:28px}.index-meta{padding:0;font-size:11px;justify-content:flex-end}.index-state{display:block;grid-column:1/-1;grid-row:3;margin:7px 0 0;font-size:11px}.baseline-button{grid-column:2;grid-row:2;font-size:11px;padding:2px 0 0;text-align:right}.workspace>.wrap{padding:0 24px 25px}.workspace header{padding:16px 0}.hero{padding-top:12px}.hero:before{inset:-20px -24px}.baseline-band input{padding:10px}}
+@media(max-width:520px){.sidebar{padding:16px 20px;gap:23px}.workspace>.wrap{padding:0 20px 25px}.area-name{font-size:15px}.area-link strong{font-size:25px}.hero:before{inset:-20px -20px}.overview-label{font-size:12px}.sidebar nav{column-gap:13px}.photo-remove{font-size:12px}}
 </style>
 </head>
 <body>
 <noscript>This page needs JavaScript to connect to your database.</noscript>
+<div class="workspace">
+<aside class="sidebar" aria-label="Your areas"><div class="brand" aria-label="YOU">YOU<span>.</span></div><p class="nav-label">YOUR SPACE</p><nav aria-label="Areas"><a class="area-link" href="#body" aria-current="page"><span class="area-name"><svg viewBox="0 0 20 26" fill="none" aria-hidden="true"><circle cx="10" cy="4" r="2.8" stroke="currentColor" stroke-width="1.4"/><path d="M4 14v-2a6 6 0 0 1 12 0v2M7 11v12m6-12v12M7 17h6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Body</span><strong id="body-index">—</strong></a><div class="index-meta"><span id="body-index-label">Your index</span><span>100 baseline</span></div><p class="index-state" id="body-index-state">Start with a reading.</p><button type="button" class="baseline-button" id="baseline-open">Baseline details ↗</button></nav></aside>
 <div class="wrap">
-<header><div class="brand" aria-label="YOU">YOU<span>.</span></div><div class="header-right"><span class="status" id="connection-status">Your record</span><button class="quiet-button" id="connect-open" type="button">Sign in ↗</button><button class="quiet-button" id="log-open" type="button" hidden>Log weight +</button><button class="text-button" id="sign-out" type="button" hidden>Sign out</button></div></header>
+<header><span class="overview-label">Your overview</span><div class="header-right"><span class="status" id="connection-status">Your record</span><button class="quiet-button" id="connect-open" type="button">Sign in ↗</button><button class="quiet-button" id="log-open" type="button" hidden>Log weight +</button><button class="text-button" id="sign-out" type="button" hidden>Sign out</button></div></header>
 <main>
-<section class="hero" aria-label="Body history">
-<div class="hero-top"><div><span class="eyebrow">YOUR WIRE</span><h1>BODY.</h1></div><div class="latest-block"><p class="point-metric" id="point-metric">Weight</p><div class="latest"><strong id="point-value">—</strong><span id="point-unit"></span></div><p class="latest-time" id="point-time">Your next reading starts here.</p></div></div>
+<section class="hero" id="body" aria-label="Body history">
+<div class="hero-top"><div><h1>BODY.</h1></div><div class="latest-block"><p class="point-metric" id="point-metric">Weight</p><div class="latest"><strong id="point-value">—</strong><span id="point-unit"></span></div><p class="latest-time" id="point-time">Your next reading starts here.</p></div></div>
 <div class="chart-area"><div class="chart-empty" id="chart-empty"><svg class="empty-mark" viewBox="0 0 72 72" aria-hidden="true"><circle cx="36" cy="36" r="31" fill="none" stroke="#365147" stroke-dasharray="2 6"/><circle cx="36" cy="36" r="12" fill="#89ebcb08" stroke="#466757"/><circle cx="36" cy="36" r="3" fill="#89ebcb"/></svg><h2 id="empty-title">One reading starts your line.</h2><p id="empty-copy">Log your weight. Each check-in adds a point here.</p></div><div id="chart-data" hidden><svg id="plot" class="plot" viewBox="0 0 700 300" tabindex="0" role="img" aria-label="Recorded values over time. Use the left and right arrow keys to inspect readings."></svg></div></div>
 <div class="chart-toolbar"><p id="history-subtitle">Weight over time · recorded values</p><label id="history-picker" hidden><select id="history-select" aria-label="Measurement to display"></select></label></div>
 </section>
 <section aria-labelledby="readings-title"><div class="section-head"><div class="left"><h2 id="readings-title">Behind the graph</h2><span id="record-count">Your readings</span></div></div><div class="records" id="records"><p class="record-empty">Sign in to see your readings.</p></div><p class="message" id="history-message" role="status" aria-live="polite"></p><button type="button" class="quiet-button" id="retry-read" hidden>Retry loading</button></section>
-<section class="photos-section" aria-labelledby="photos-title"><div class="section-head"><div class="left"><h2 id="photos-title">Progress photos</h2><span id="photo-count">Optional</span></div><button class="text-button" id="photo-open" type="button">Add photo +</button></div><div class="photos" id="photos"><p class="photo-empty">A visual record, whenever you want to add one.</p></div></section>
+<section class="photos-section" aria-labelledby="photos-title"><div class="section-head"><div class="left"><h2 id="photos-title">Progress photos</h2><span id="photo-count">Optional</span></div><button class="text-button" id="photo-open" type="button">Add photo +</button></div><div class="photos" id="photos"><p class="photo-empty">A visual record, whenever you want to add one.</p></div><div class="photo-actions"><p class="message" id="photo-action-message" role="status" aria-live="polite"></p><button class="text-button" id="photo-action-retry" type="button" hidden>Retry removal</button><button class="text-button" id="photo-undo" type="button" hidden>Undo last removal</button></div><details class="removed-photos" id="removed-photos" hidden><summary id="removed-photo-count">Removed photos</summary><p class="removed-photo-note">Hidden from your gallery. The original stays private.</p><div id="removed-photo-list"></div></details></section>
 </main>
-<footer class="footer"><span>Every check-in adds to the same record.</span><a href="https://github.com/RowanThistlebrooke/wire-starter" target="_blank" rel="noopener noreferrer">The Wire · Episode 01 ↗</a></footer>
+</div>
 </div>
 <dialog id="reading-dialog" aria-labelledby="reading-title"><div class="modal-head"><h2 id="reading-title">Log weight.</h2><button class="close" id="reading-close" type="button" aria-label="Close weight form">×</button></div><form class="entry" id="reading-form"><fieldset id="reading-fields" disabled>
 <div class="number-fields"><label class="field"><span>Weight</span><input id="value" type="text" inputmode="decimal" placeholder="—" autocomplete="off" required maxlength="100"></label><label class="field"><span>Unit</span><select id="unit" required><option value="">Choose</option><option value="kg">kg</option><option value="lbs">lbs</option></select></label></div>
@@ -35,9 +41,12 @@
 <dialog id="photo-dialog" aria-labelledby="photo-title"><div class="modal-head"><h2 id="photo-title">Add a progress photo.</h2><button class="close" id="photo-close" type="button" aria-label="Close photo form">×</button></div><form class="photo-form" id="photo-form"><fieldset id="photo-fields"><label class="field"><span>Photo</span><input id="photo-file" type="file" accept="image/jpeg,image/png,image/webp" required><p class="file-note">JPG, PNG or WebP · up to 6 MB</p></label><img id="photo-preview" class="photo-preview" alt="Photo you selected to upload" hidden><label class="field"><span>When it was taken</span><input id="photo-occurred" type="datetime-local" required></label><button class="primary" type="submit">Save photo ↗</button></fieldset><p class="form-footnote">Stored privately in your database’s photo storage. Photos don’t change your weight graph.</p><p class="message" id="photo-message" role="status" aria-live="polite"></p></form></dialog>
 <dialog id="connection-dialog" aria-labelledby="connect-title"><div class="modal-head"><h2 id="connect-title">Sign in.</h2><button class="close" id="connect-close" type="button" aria-label="Close sign-in">×</button></div><p class="modal-copy">Your readings, in your database.</p>
 <form id="connect-form">
-<label class="field"><span>Email</span><input id="email" type="email" autocomplete="username" required></label><label class="field"><span>Password</span><input id="password" type="password" autocomplete="current-password" required></label><p class="auth-caption">Use the login you created in Supabase → Authentication → Users.</p><button class="primary" id="connect-submit" type="submit">Sign in ↗</button><p class="message" id="connect-message" role="status"></p>
+<label class="field"><span>Email</span><input id="email" type="email" autocomplete="username" required></label><label class="field"><span>Password</span><input id="password" type="password" autocomplete="current-password" required></label><button class="primary" id="connect-submit" type="submit">Sign in ↗</button><p class="message" id="connect-message" role="status"></p>
 </form></dialog>
+<dialog id="baseline-dialog" aria-labelledby="baseline-title"><div class="modal-head"><h2 id="baseline-title">Your baseline. 100.</h2><button class="close" id="baseline-close" type="button" aria-label="Close baseline details">×</button></div><p class="baseline-copy">Choose what progress means to you. Above 100 means movement in that direction.</p><form id="baseline-form"><fieldset id="baseline-fields" style="border:0;padding:0;margin:0;min-width:0"><div class="baseline-rules" id="baseline-rules"></div><button class="primary" id="baseline-save" type="submit">Save direction ↗</button></fieldset><p class="message" id="baseline-message" role="status"></p></form><p class="baseline-note">Your first 30 recorded days set the baseline. Until then, it is still forming. A flat history has no index. For each measurement, ten points equals one standard deviation, not 10%.</p></dialog>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/dist/umd/supabase.js"></script>
+<script src="/you-reader.js"></script>
+<script src="/body-index.js"></script>
 <script>
 
 'use strict';
@@ -51,9 +60,11 @@ const sourceName = source => ({pad:'Page',you:'You',manual:'Manual',claude:'MCP'
 const PHOTO_BUCKET='body-progress', PHOTO_LIMIT=6*1024*1024;
 let intent=new URLSearchParams(location.search).get('log')==='weight'?'weight':'', photoPending=null, previewUrl='', photoSignature='', photoObserver=null;
 const photoUrls=new Map();
+let photoVisibilityPending=null,lastPhotoRemoval=null,photoState={photos:[],visible:[],removed:[],latest:new Map()};
 let photoRevision=0,historyLoading=0,historySignature='';
 let client = null, authSubscription = null, user = null, rows = [], groups = new Map(), selected = '', generation = 0, request = 0, busy = false, pending = null, plotPoints = [], activePoint = -1;
 let connectionPromise = null;
+let bodyIndexState=null,baselineRequest=0,baselineFetchedAt=0,baselinePending=null,baselineError='';
 function message(id,text,kind=''){ $(id).textContent = text; $(id).className = 'message' + (kind ? ' '+kind : ''); }
 function localNow(){ const date = new Date(); return new Date(date.getTime()-date.getTimezoneOffset()*60000).toISOString().slice(0,16); }
 $('occurred').value = localNow();
@@ -82,6 +93,7 @@ function showConnection(){ $('connection-dialog').showModal(); $('email').focus(
 $('connect-open').onclick = showConnection;
 $('connect-close').onclick = () => { if(!busy)$('connection-dialog').close(); };
 function resetView(){
+  baselineRequest++; bodyIndexState=null; baselineFetchedAt=0; baselinePending=null; baselineError=''; renderBodyIndex(); $('baseline-dialog').close();
   historySignature=''; rows=[]; groups=new Map(); selected=''; plotPoints=[]; activePoint=-1;
   $('history-picker').hidden=true; $('chart-data').hidden=true; $('chart-empty').hidden=false;
   $('empty-title').textContent='One reading starts your line.';
@@ -90,7 +102,7 @@ function resetView(){
   $('records').innerHTML='<p class="record-empty">Sign in to see your readings.</p>';
   $('record-count').textContent='Your readings';
   $('history-subtitle').textContent='Weight over time · recorded values'; $('retry-read').hidden=true;
-  clearPhotos(); message('history-message','');
+  clearPhotos(true); message('history-message','');
 }
 function openInput(kind){
   intent=kind;
@@ -139,7 +151,7 @@ $('connect-form').addEventListener('submit',async event => {
     $('password').value='';
     setUser(data.user); $('connection-dialog').close(); message('connect-message',''); finishIntent();
   } catch(error){ message('connect-message',error.message || 'Could not sign in. Check your email and password.','error'); }
-  finally { busy=false; $('connect-submit').disabled=false; }
+  finally { busy=false; $('connect-submit').disabled=false; updatePhotoActions(); }
 });
 $('sign-out').onclick=async () => {
   if (!client || busy) return;
@@ -149,7 +161,7 @@ $('sign-out').onclick=async () => {
     if(error) throw error;
     setUser(null);
   } catch(error){ message('history-message',error.message || 'Could not sign out. Please retry.','error'); }
-  finally { busy=false; $('sign-out').disabled=false; $('reading-fields').disabled=!user; }
+  finally { busy=false; $('sign-out').disabled=false; $('reading-fields').disabled=!user; updatePhotoActions(); }
 };
 // Read every page, even if the server caps a request below our requested size.
 // A failed page throws; partial history is never presented as complete.
@@ -170,11 +182,11 @@ async function loadHistory(preferred=''){
   message('history-message','Loading your record…'); $('retry-read').hidden=true;
   try {
     const result=await readAll(() => db.from('events').select('id,metric,value::text,unit,occurred_at,recorded_at,source,event_type,context',{count:'exact'})
-      .eq('user_id',who).in('event_type',['measurement','progress_photo'])
+      .eq('user_id',who).in('event_type',['measurement','progress_photo','photo_visibility'])
       .order('recorded_at',{ascending:true}).order('id',{ascending:true}));
     if(version!==generation || thisRequest!==request) return false;
     const signature=JSON.stringify(result);
-    if(signature===historySignature && !preferred){ message('history-message',''); return true; }
+    if(signature===historySignature && !preferred){ message('history-message',''); if(Date.now()-baselineFetchedAt>60000)refreshBodyIndex(); return true; }
     historySignature=signature;
     rows=result.filter(row=>row.event_type==='measurement' && row.value!==null && (row.metric==='weight' || row.context?.area==='body')); groups=new Map();
     for(const row of rows){ const key=seriesKey(row); if(!groups.has(key)) groups.set(key,[]); groups.get(key).push(row); }
@@ -182,10 +194,10 @@ async function loadHistory(preferred=''){
     if(preferred && groups.has(preferred)) selected=preferred;
     if(!groups.has(selected)){ const weight=rows.filter(row=>row.metric==='weight'); selected=weight.length?seriesKey(weight.at(-1)):rows.length?seriesKey(rows.at(-1)):''; }
     $('history-select').innerHTML=[...groups].sort((a,b)=>a[1][0].metric.localeCompare(b[1][0].metric)).map(([key,group])=>`<option value="${escapeHTML(key)}"${key===selected?' selected':''}>${escapeHTML(displayName(group[0].metric))}${group[0].unit?' · '+escapeHTML(group[0].unit):' · no unit'}</option>`).join('');
-    $('history-picker').hidden=groups.size<2; drawHistory(); drawPhotos(result.filter(row=>row.event_type==='progress_photo' && row.metric==='body_progress')); message('history-message',''); return true;
+    $('history-picker').hidden=groups.size<2; drawHistory(); drawPhotos(result.filter(row=>row.event_type==='progress_photo' && row.metric==='body_progress'),result.filter(row=>row.event_type==='photo_visibility')); message('history-message',''); return true;
   } catch(error){
     if(version!==generation || thisRequest!==request) return false;
-    historySignature=''; rows=[]; groups=new Map(); plotPoints=[]; clearPhotos(); $('point-value').textContent='—'; $('point-unit').textContent=''; $('point-time').textContent='History unavailable'; $('history-picker').hidden=true; $('chart-data').hidden=true; $('chart-empty').hidden=false;
+    historySignature=''; rows=[]; groups=new Map(); plotPoints=[]; clearPhotos(); baselineRequest++; bodyIndexState=null; baselineError='History unavailable'; renderBodyIndex(); $('point-value').textContent='—'; $('point-unit').textContent=''; $('point-time').textContent='History unavailable'; $('history-picker').hidden=true; $('chart-data').hidden=true; $('chart-empty').hidden=false;
     $('empty-title').textContent='Your record could not load.'; $('empty-copy').textContent='Retry to read your saved history.';
     $('records').innerHTML=''; $('record-count').textContent='History unavailable'; $('photos').innerHTML='<p class="photo-empty">Photo history could not load. Retry the record above.</p>';
     message('history-message',error.message || 'Could not load every reading.','error'); $('retry-read').hidden=false; return false;
@@ -194,6 +206,7 @@ async function loadHistory(preferred=''){
 $('retry-read').onclick=()=>loadHistory();
 $('history-select').onchange=event=>{selected=event.target.value;drawHistory();};
 function drawHistory(){
+  refreshBodyIndex();
   const group=groups.get(selected) || [];
   $('chart-empty').hidden=!!group.length; $('chart-data').hidden=!group.length;
   if(!group.length){
@@ -304,13 +317,17 @@ $('reading-form').addEventListener('submit',async event=>{
     const loaded=await loadHistory(seriesKey(draft));
     if(version===generation){ message('save-message',loaded?'Saved. It’s in your record.':'Saved. History could not refresh; use Retry loading.','success'); $('reading-dialog').close(); }
   }catch(error){if(version===generation)message('save-message',(error.message || 'Save could not be confirmed.')+' Retry the same reading to avoid a duplicate.','error');}
-  finally{busy=false;$('reading-fields').disabled=!user;$('sign-out').disabled=false;}
+  finally{busy=false;$('reading-fields').disabled=!user;$('sign-out').disabled=false;updatePhotoActions();}
 });
-function clearPhotos(){
+function clearPhotos(resetActions=false){
   photoRevision++;
   photoObserver?.disconnect(); photoObserver=null; photoSignature='';
   for(const url of photoUrls.values())URL.revokeObjectURL(url); photoUrls.clear();
   $('photos').innerHTML='<p class="photo-empty">A visual record, whenever you want to add one.</p>'; $('photo-count').textContent='Optional';
+  photoState={photos:[],visible:[],removed:[],latest:new Map()};
+  $('removed-photos').hidden=true; $('removed-photo-list').innerHTML='';
+  if(resetActions){ photoVisibilityPending=null; lastPhotoRemoval=null; $('removed-photos').open=false; message('photo-action-message',''); }
+  updatePhotoActions();
 }
 function resetPhotoForm(){
   if(previewUrl)URL.revokeObjectURL(previewUrl); previewUrl='';
@@ -333,34 +350,106 @@ function validPhoto(row,who){
   const context=row.context || {};
   return context.bucket===PHOTO_BUCKET && typeof context.path==='string' && context.path.startsWith(who+'/') && /^[a-f0-9-]+\/(?:[a-f0-9-]+)\.(?:jpg|png|webp)$/i.test(context.path);
 }
-function drawPhotos(photos){
+// Visibility is another event: no photo, object or earlier row is changed.
+function photoVisibilityState(photos,events){
+  const known=new Set(photos.map(row=>row.id)),latest=new Map();
+  for(const row of events){
+    const c=row.context,at=Date.parse(row.recorded_at);
+    if(row.event_type!=='photo_visibility' || row.metric!=='body_progress' || !c || typeof c.hidden!=='boolean' || !known.has(c.photo_id) || !Number.isFinite(at) || typeof row.id!=='string')continue;
+    const previous=latest.get(c.photo_id),before=previous?Date.parse(previous.recorded_at):-Infinity;
+    if(!previous || at>before || (at===before && row.id>previous.id))latest.set(c.photo_id,row);
+  }
   const ordered=[...photos].sort((a,b)=>b.occurred_at.localeCompare(a.occurred_at) || b.id.localeCompare(a.id));
-  const signature=JSON.stringify(ordered.map(row=>[row.id,row.occurred_at,row.context?.path]));
-  if(signature===photoSignature)return;
-  clearPhotos(); photoSignature=signature;
-  if(!ordered.length)return;
-  $('photo-count').textContent=ordered.length+' photo'+(ordered.length===1?'':'s');
+  return {photos:ordered,visible:ordered.filter(row=>latest.get(row.id)?.context.hidden!==true),removed:ordered.filter(row=>latest.get(row.id)?.context.hidden===true),latest};
+}
+function updatePhotoActions(){
+  const waiting=!!photoVisibilityPending;
+  $('photos').querySelectorAll('[data-remove-photo]').forEach(button=>{button.disabled=busy || waiting || !user;});
+  $('removed-photo-list').querySelectorAll('[data-restore-photo]').forEach(button=>{button.disabled=busy || waiting || !user;});
+  $('photo-action-retry').hidden=!waiting;
+  $('photo-action-retry').disabled=busy || !user;
+  $('photo-action-retry').textContent=photoVisibilityPending?.hidden?'Retry removal':'Retry restore';
+  $('photo-undo').hidden=!lastPhotoRemoval || lastPhotoRemoval.userId!==user?.id || !photoState.removed.some(row=>row.id===lastPhotoRemoval.photoId);
+  $('photo-undo').disabled=busy || waiting || !user;
+}
+function samePhotoVisibility(saved,operation){
+  return saved?.user_id===operation.userId && saved.event_type==='photo_visibility' && saved.metric==='body_progress' && saved.source==='pad' && saved.source_id===operation.id && saved.value===null && saved.unit===null && Date.parse(saved.occurred_at)===Date.parse(operation.occurredAt) && saved.context?.photo_id===operation.photoId && saved.context?.hidden===operation.hidden;
+}
+async function setPhotoVisibility(photoId,hidden){
+  if(!user || !client || busy || typeof hidden!=='boolean')return;
+  const who=user.id,version=generation,db=client;
+  if(photoVisibilityPending && (photoVisibilityPending.userId!==who || photoVisibilityPending.photoId!==photoId || photoVisibilityPending.hidden!==hidden)){
+    message('photo-action-message','Finish the pending photo change with Retry first.','error');return;
+  }
+  if(!photoVisibilityPending){
+    if(!photoState.photos.some(row=>row.id===photoId))return;
+    if((photoState.latest.get(photoId)?.context.hidden===true)===hidden)return;
+    photoVisibilityPending={userId:who,photoId,hidden,id:crypto.randomUUID(),occurredAt:new Date().toISOString()};
+  }
+  const operation=photoVisibilityPending;
+  busy=true; $('sign-out').disabled=true; updatePhotoActions();
+  message('photo-action-message',hidden?'Removing from gallery…':'Restoring photo…');
+  try{
+    const {error}=await db.from('events').insert({user_id:who,event_type:'photo_visibility',metric:'body_progress',value:null,unit:null,source:'pad',source_id:operation.id,occurred_at:operation.occurredAt,context:{photo_id:photoId,hidden}});
+    if(error){
+      if(error.code!=='23505')throw error;
+      const existing=await db.from('events').select('user_id,event_type,metric,value,unit,source,source_id,occurred_at,context').eq('user_id',who).eq('source','pad').eq('source_id',operation.id).eq('metric','body_progress').maybeSingle();
+      if(existing.error || !samePhotoVisibility(existing.data,operation))throw existing.error || new Error('The saved photo change could not be verified.');
+    }
+    if(version!==generation || user?.id!==who)return;
+    photoVisibilityPending=null;
+    if(hidden)lastPhotoRemoval={userId:who,photoId};
+    else if(lastPhotoRemoval?.photoId===photoId)lastPhotoRemoval=null;
+    const loaded=await loadHistory();
+    if(version!==generation || user?.id!==who)return;
+    message('photo-action-message',loaded?(hidden?'Removed from gallery. You can restore it anytime.':'Photo restored.'):'Photo change saved. Use Retry loading above to refresh your gallery.','success');
+  }catch(error){
+    if(version===generation && user?.id===who)message('photo-action-message',(error.message || 'The photo change could not be confirmed.')+' Use Retry to safely finish the same change.','error');
+  }finally{
+    busy=false;
+    $('sign-out').disabled=false;updatePhotoActions();
+  }
+}
+$('photo-action-retry').onclick=()=>{if(photoVisibilityPending)setPhotoVisibility(photoVisibilityPending.photoId,photoVisibilityPending.hidden);};
+$('photo-undo').onclick=()=>{if(lastPhotoRemoval?.userId===user?.id)setPhotoVisibility(lastPhotoRemoval.photoId,false);};
+function drawPhotos(photos,visibility=[]){
+  const next=photoVisibilityState(photos,visibility);
+  const signature=JSON.stringify([next.photos.map(row=>[row.id,row.occurred_at,row.context?.path]),[...next.latest].map(([id,row])=>[id,row.id,row.recorded_at,row.context.hidden])]);
+  if(signature===photoSignature){updatePhotoActions();return;}
+  clearPhotos(); photoSignature=signature; photoState=next;
+  const ordered=next.visible;
+  $('photo-count').textContent=next.photos.length?ordered.length+' photo'+(ordered.length===1?'':'s'):'Optional';
   const who=user.id,db=client,version=generation,revision=photoRevision;
-  $('photos').innerHTML=ordered.map((row,index)=>`<figure class="photo-card" data-photo="${index}"><div class="photo-image"><p>Loading private photo…</p><img alt="Progress photo taken ${escapeHTML(stamp(row.occurred_at))}" hidden></div><figcaption>${escapeHTML(stamp(row.occurred_at))}<small>${escapeHTML(sourceName(row.source))} · saved ${escapeHTML(new Date(row.recorded_at).toLocaleDateString([],{month:'short',day:'numeric'}))}</small></figcaption></figure>`).join('');
+  $('removed-photos').hidden=!next.removed.length;
+  $('removed-photo-count').textContent='Removed photos · '+next.removed.length;
+  $('removed-photo-list').innerHTML=next.removed.map(row=>`<div class="removed-photo-row"><time datetime="${escapeHTML(row.occurred_at)}">${escapeHTML(stamp(row.occurred_at))}</time><button class="photo-restore text-button" type="button" data-restore-photo="${escapeHTML(row.id)}" aria-label="Restore progress photo taken ${escapeHTML(stamp(row.occurred_at))}">Restore</button></div>`).join('');
+  $('removed-photo-list').querySelectorAll('[data-restore-photo]').forEach(button=>{button.onclick=()=>{if(version===generation && revision===photoRevision && user?.id===who)setPhotoVisibility(button.dataset.restorePhoto,false);};});
+  if(!ordered.length){
+    if(next.removed.length)$('photos').innerHTML='<p class="photo-empty">No photos in your gallery. Restore one below or add a new photo.</p>';
+    updatePhotoActions();return;
+  }
+  $('photos').innerHTML=ordered.map((row,index)=>`<figure class="photo-card" data-photo="${index}"><div class="photo-image"><p>Loading private photo…</p><img alt="Progress photo taken ${escapeHTML(stamp(row.occurred_at))}" hidden></div><figcaption><time datetime="${escapeHTML(row.occurred_at)}">${escapeHTML(stamp(row.occurred_at))}</time><small>${escapeHTML(sourceName(row.source))} · saved ${escapeHTML(new Date(row.recorded_at).toLocaleDateString([],{month:'short',day:'numeric'}))}</small><button class="photo-remove text-button" type="button" data-remove-photo="${escapeHTML(row.id)}" aria-label="Remove progress photo taken ${escapeHTML(stamp(row.occurred_at))} from gallery">Remove from gallery</button></figcaption></figure>`).join('');
+  $('photos').querySelectorAll('[data-remove-photo]').forEach(button=>{button.onclick=()=>{if(version===generation && revision===photoRevision && user?.id===who)setPhotoVisibility(button.dataset.removePhoto,true);};});
+  updatePhotoActions();
   const load=async card=>{
-    if(version!==generation || revision!==photoRevision)return;
+    if(version!==generation || revision!==photoRevision || user?.id!==who)return;
     const row=ordered[Number(card.dataset.photo)],placeholder=card.querySelector('.photo-image');
     if(!validPhoto(row,who)){placeholder.innerHTML='<p>This photo has an unsupported storage reference.</p>';return;}
     try{
       const {data,error}=await db.storage.from(PHOTO_BUCKET).download(row.context.path);
       if(error)throw error;
-      if(version!==generation || revision!==photoRevision || photoSignature!==signature)return;
+      if(version!==generation || revision!==photoRevision || photoSignature!==signature || user?.id!==who)return;
       if(!data || !['image/jpeg','image/png','image/webp'].includes(data.type) || data.size>PHOTO_LIMIT)throw new Error('Unsupported photo format.');
       const url=URL.createObjectURL(data); photoUrls.set(row.id,url);
       const img=card.querySelector('img'); img.src=url; img.hidden=false; placeholder.querySelector('p')?.remove();
-      img.onerror=()=>{ URL.revokeObjectURL(url); if(photoUrls.get(row.id)===url)photoUrls.delete(row.id); if(version!==generation || revision!==photoRevision)return; placeholder.innerHTML='<p>This file could not be displayed.</p>'; };
+      img.onerror=()=>{ URL.revokeObjectURL(url); if(photoUrls.get(row.id)===url)photoUrls.delete(row.id); if(version!==generation || revision!==photoRevision || user?.id!==who)return; placeholder.innerHTML='<p>This file could not be displayed.</p>'; };
     }catch(error){
-      if(version!==generation || revision!==photoRevision || photoSignature!==signature)return;
+      if(version!==generation || revision!==photoRevision || photoSignature!==signature || user?.id!==who)return;
       placeholder.innerHTML='<p>Photo could not load.</p><button type="button" class="text-button">Retry</button>';
       placeholder.querySelector('button').onclick=()=>{placeholder.innerHTML='<p>Loading private photo…</p><img alt="Saved progress photo" hidden>';load(card);};
     }
   };
-  const observer=new IntersectionObserver(entries=>{if(version!==generation || revision!==photoRevision)return; for(const entry of entries)if(entry.isIntersecting){observer.unobserve(entry.target);load(entry.target);}}, {root:$('photos'),rootMargin:'120px'});
+  const observer=new IntersectionObserver(entries=>{if(version!==generation || revision!==photoRevision || user?.id!==who)return; for(const entry of entries)if(entry.isIntersecting){observer.unobserve(entry.target);load(entry.target);}}, {root:$('photos'),rootMargin:'120px'});
   photoObserver=observer; $('photos').querySelectorAll('[data-photo]').forEach(card=>observer.observe(card));
 }
 async function fileHash(file){ return [...new Uint8Array(await crypto.subtle.digest('SHA-256',await file.arrayBuffer()))].map(byte=>byte.toString(16).padStart(2,'0')).join(''); }
@@ -404,7 +493,96 @@ $('photo-form').addEventListener('submit',async event=>{
       const text=/bucket.*not found|row.level security|not authorized/i.test(error.message || '')?'Photo storage needs setup. Run photos.sql from this repo in your Supabase SQL Editor, then retry.':(error.message || 'Photo save could not be confirmed.')+' Retry this same photo to continue.';
       message('photo-message',text,'error');
     }
-  }finally{busy=false;$('photo-fields').disabled=false;$('sign-out').disabled=false;}
+  }finally{busy=false;$('photo-fields').disabled=false;$('sign-out').disabled=false;updatePhotoActions();}
+});
+function renderBodyIndex(){
+  const state=bodyIndexState,value=state?.value;
+  $('body-index').textContent=Number.isFinite(value)?value.toFixed(1):'—';
+  $('body-index').className=Number.isFinite(value)?(value>100?'pos':value<100?'neg':''):'';
+  $('body-index-label').textContent=state?.day?new Date(state.day+'T12:00:00Z').toLocaleDateString([],{month:'short',day:'numeric',timeZone:'UTC'}):'Your index';
+  $('body-index-state').textContent=baselineError?'Index unavailable.':Number.isFinite(value)?`${state.state==='moving'?'Forming baseline':'Fixed baseline'} · ${state.included}/${state.total} measurements`:state?.reason || 'Start with a reading.';
+  const coverage=state?['Available index',state.includedMembers.length?'Counted: '+state.includedMembers.map(displayName).join(', '):'No measurements counted',...state.missingMembers.map(metric=>displayName(metric)+': '+(state.reasons[metric] || 'Not scored')), ...state.ignoredMembers.map(metric=>displayName(metric)+': kept out of index')].join('\n'):'';
+  $('body-index').title=coverage; $('body-index-state').title=coverage;
+  $('body-index').setAttribute('aria-label',Number.isFinite(value)?'Body index '+value.toFixed(1):'Body index not available');
+}
+async function refreshBodyIndex(){
+  const version=generation,db=client,who=user?.id,thisRequest=++baselineRequest;
+  baselineFetchedAt=Date.now();
+  if(!who || !rows.length){ bodyIndexState=null; baselineError=''; renderBodyIndex(); return null; }
+  try{
+    if(!window.BodyIndex)throw new Error('The index could not load. Refresh the page to retry.');
+    const state=await BodyIndex.load(db,rows,who);
+    if(version!==generation || thisRequest!==baselineRequest || user?.id!==who)return null;
+    bodyIndexState=state; baselineError=''; renderBodyIndex(); return state;
+  }catch(error){
+    if(version!==generation || thisRequest!==baselineRequest)return null;
+    bodyIndexState=null; baselineError=error.message || 'The index could not load.'; renderBodyIndex(); return null;
+  }
+}
+function drawBaselineForm(){
+  const state=bodyIndexState,members=[...(state?.members || []),...(state?.ignoredMembers || [])];
+  $('baseline-save').hidden=!members.length && !baselineError; $('baseline-save').textContent=members.length?'Save direction ↗':'Retry loading';
+  if(!members.length){ $('baseline-rules').innerHTML='<p class="baseline-copy">'+escapeHTML(baselineError || 'Log a reading to start your baseline.')+'</p>'; return; }
+  const choices=[['','Choose direction'],['up','Higher is progress'],['down','Lower is progress'],['band','Stay within a range'],['ignore','Keep out of my index']];
+  $('baseline-rules').innerHTML=members.map(metric=>{
+    const unit=state.eligibleUnits[metric],rule=state.rules[metric] || {},kind=choices.some(([value])=>value===rule.kind)?rule.kind:'',note=state.reasons[metric] || (state.ignoredMembers.includes(metric)?'Kept out of your index':'');
+    return `<div class="baseline-rule" data-baseline-metric="${escapeHTML(metric)}" data-baseline-unit="${escapeHTML(unit || '')}"><div class="baseline-rule-head"><strong>${escapeHTML(displayName(metric))}</strong><span>${escapeHTML(unit || 'Mixed or missing units')}</span></div><select aria-label="Progress direction for ${escapeHTML(displayName(metric))}"${unit?'':' disabled'}>${choices.map(([value,label])=>`<option value="${value}"${kind===value?' selected':''}>${label}</option>`).join('')}</select><div class="baseline-band"${kind==='band'?'':' hidden'}><label>From<input data-bound="lo" inputmode="decimal" type="text" aria-label="Lower limit for ${escapeHTML(displayName(metric))}" value="${Number.isFinite(rule.lo)?escapeHTML(rule.lo):''}"></label><label>To<input data-bound="hi" inputmode="decimal" type="text" aria-label="Upper limit for ${escapeHTML(displayName(metric))}" value="${Number.isFinite(rule.hi)?escapeHTML(rule.hi):''}"></label></div>${note?'<p class="baseline-note">'+escapeHTML(note)+'.</p>':''}</div>`;
+  }).join('');
+}
+$('baseline-rules').addEventListener('change',event=>{if(event.target.tagName==='SELECT')event.target.closest('.baseline-rule').querySelector('.baseline-band').hidden=event.target.value!=='band';});
+$('baseline-open').onclick=async()=>{
+  if(busy)return;
+  if(!user){showConnection();return;}
+  $('baseline-dialog').showModal(); message('baseline-message','');
+  $('baseline-rules').innerHTML='<p class="baseline-copy">Loading your baseline…</p>'; $('baseline-save').hidden=true;
+  await refreshBodyIndex(); if($('baseline-dialog').open)drawBaselineForm();
+};
+$('baseline-close').onclick=()=>{if(!busy)$('baseline-dialog').close();};
+$('baseline-dialog').addEventListener('cancel',event=>{if(busy)event.preventDefault();});
+function sameRule(a,b){return a?.kind===b?.kind && a?.unit===b?.unit && (b.kind!=='band' || (a?.lo===b.lo && a?.hi===b.hi));}
+$('baseline-form').addEventListener('submit',async event=>{
+  event.preventDefault(); if(busy || !user || !client)return;
+  if(!bodyIndexState){
+    $('baseline-save').disabled=true; await refreshBodyIndex(); $('baseline-save').disabled=false;
+    if($('baseline-dialog').open){drawBaselineForm(); message('baseline-message',baselineError || 'Baseline loaded.',baselineError?'error':'');}
+    return;
+  }
+  const changes=[]; let chosen=0;
+  try{
+    for(const element of $('baseline-rules').querySelectorAll('[data-baseline-metric]')){
+      const metric=element.dataset.baselineMetric,unit=element.dataset.baselineUnit,kind=element.querySelector('select').value;
+      if(!unit || !kind)continue;
+      chosen++;
+      if(!['up','down','band','ignore'].includes(kind))throw new Error('Choose a direction for each measurement.');
+      const rule={kind,unit,area:'body'};
+      if(kind==='band'){
+        for(const bound of ['lo','hi']){
+          const raw=element.querySelector(`[data-bound="${bound}"]`).value.trim(),value=Number(raw);
+          if(!raw || !Number.isFinite(value) || decimalIdentity(raw)!==decimalIdentity(String(value)))throw new Error('Enter a valid lower and upper limit for '+displayName(metric)+'.');
+          rule[bound]=value;
+        }
+        if(rule.lo>rule.hi)throw new Error('The lower limit must be below the upper limit.');
+      }
+      if(!sameRule(bodyIndexState.rules[metric],rule))changes.push({metric,rule});
+    }
+    if(!changes.length){message('baseline-message',chosen?'Your directions are already saved.':'Choose a direction to include a measurement in your index.');return;}
+  }catch(error){message('baseline-message',error.message,'error');return;}
+  const who=user.id,version=generation,db=client,fingerprint=JSON.stringify([who,changes]);
+  if(!baselinePending || baselinePending.fingerprint!==fingerprint)baselinePending={fingerprint,id:crypto.randomUUID(),at:new Date().toISOString()};
+  const operation=baselinePending,payload=changes.map(({metric,rule})=>({user_id:who,metric,value:null,unit:null,event_type:'rule',source:'pad',source_id:operation.id,occurred_at:operation.at,context:rule}));
+  busy=true; $('baseline-fields').disabled=true; $('sign-out').disabled=true; updatePhotoActions(); message('baseline-message','Saving your direction…');
+  try{
+    const {error}=await db.from('events').insert(payload);
+    if(error){
+      if(error.code!=='23505')throw error;
+      const saved=await readAll(()=>db.from('events').select('user_id,metric,event_type,source,source_id,occurred_at,context',{count:'exact'}).eq('user_id',who).eq('source','pad').eq('source_id',operation.id).in('metric',changes.map(change=>change.metric)).order('metric',{ascending:true}).order('id',{ascending:true}));
+      if(saved.length!==payload.length || !payload.every(expected=>saved.some(row=>row.user_id===who && row.metric===expected.metric && row.event_type==='rule' && row.source==='pad' && row.source_id===operation.id && Date.parse(row.occurred_at)===Date.parse(operation.at) && sameRule(row.context,expected.context))))throw new Error('The saved direction could not be verified. Retry the same choices.');
+    }
+    if(version!==generation || user?.id!==who)return;
+    baselinePending=null; await refreshBodyIndex();
+    if(version===generation){ if(baselineError){drawBaselineForm(); message('baseline-message','Direction saved. '+baselineError,'error');} else $('baseline-dialog').close(); }
+  }catch(error){if(version===generation)message('baseline-message',(error.message || 'Could not save your direction.')+' Retry to finish the same change.','error');}
+  finally{busy=false; $('baseline-fields').disabled=false; $('sign-out').disabled=false; updatePhotoActions();}
 });
 // External inputs appear on returning to the page and while the page is visible.
 function refreshWhenVisible(){ if(user && !busy && !historyLoading && document.visibilityState==='visible')loadHistory(); }

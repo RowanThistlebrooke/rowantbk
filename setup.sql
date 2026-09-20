@@ -1,4 +1,4 @@
--- Episode 1: run once in a NEW Supabase project.
+-- Run once in a NEW Supabase project.
 -- Already ran The Wire table file? Skip this file; it is the same schema.
 -- Choose your own timezone in day_of below before running.
 begin;

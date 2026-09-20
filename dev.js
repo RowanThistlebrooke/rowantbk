@@ -10,14 +10,15 @@ const port = Number(process.env.BODY_PORT || 8797);
 http.createServer(async (request, response) => {
   const pathname = new URL(request.url, 'http://localhost').pathname;
   if (pathname === '/api/config') return config(request, response);
-  if (request.method !== 'GET' || !['/', '/index.html'].includes(pathname)) {
+  const pages={'/':'index.html','/index.html':'index.html','/you-reader.js':'you-reader.js','/body-index.js':'body-index.js'};
+  if (request.method !== 'GET' || !Object.hasOwn(pages,pathname)) {
     response.writeHead(404, {'Content-Type': 'text/plain'});
     response.end('Not found');
     return;
   }
   try {
-    const page = await readFile(path.join(__dirname, 'index.html'));
-    response.writeHead(200, {'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store'});
+    const page = await readFile(path.join(__dirname,pages[pathname]));
+    response.writeHead(200, {'Content-Type': (pathname.endsWith('.js')?'application/javascript':'text/html')+'; charset=utf-8', 'Cache-Control': 'no-store'});
     response.end(page);
   } catch {
     response.writeHead(500, {'Content-Type': 'text/plain'});

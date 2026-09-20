@@ -1,8 +1,8 @@
-# BODY — your first Wire page
+# BODY — your space
 
 **A graph. The readings behind it. Your progress photos.**
 
-[index.html](index.html) is the whole page: plain HTML, CSS and JavaScript, with a pinned Supabase browser client. It starts with measured weight and grows as you add readings. No framework or build step.
+[index.html](index.html) is the page: plain HTML, CSS and JavaScript, with a pinned Supabase browser client and the shared Wire index reader. It starts with measured weight and grows as you add readings. No framework or build step.
 
 ## First: deploy BODY
 
@@ -26,14 +26,25 @@ Run [photos.sql](photos.sql) once in the same project, then use the page's photo
 - Use JPEG, PNG or WebP, up to **6 MiB**. Export HEIC to JPEG first.
 - A photo is a visual record; it does not generate body-fat, muscle or weight values.
 - Uploads use new paths. Existing photos and event rows are not overwritten or deleted.
+- **Remove from gallery** hides a photo, including one that cannot load. Use **Undo last removal** or **Removed photos → Restore** to bring it back. This changes gallery visibility; it does not permanently erase the private image.
 
 The optional SQL is safe to rerun. It stops if an existing bucket has incompatible settings or other Storage policies might grant broader access. It does not silently change those settings.
 
 ## What the graph means
 
-Each point is a recorded reading, shown in its original units. Weight in kg and weight in lbs stay separate. Additional BODY measurements can use the same layout, one measurement and unit at a time; they are never averaged into a body score.
+Each point is a recorded reading, shown in its original units. Weight in kg and weight in lbs stay separate. Additional BODY measurements use the same layout, one measurement and unit at a time. The graph always shows recorded values, separate from the sidebar index.
 
 Lines connect readings. Dashed spans are more than a day apart and do not fill in missing values. Readings retain both **when measured** and **when saved**. This starter shows the original raw record; it does not apply corrections/voids, estimate values, or claim what caused a change.
+
+## Your BODY index
+
+The sidebar uses **100 as a reference baseline**, not as a default score. Open **Baseline details** and choose whether higher, lower, or staying within a range represents your own progress. You can also keep a measurement out of your index and include it again later.
+
+The shared [you-reader.js](you-reader.js) supplies the same index gates as The Wire. The first 30 recorded days form the baseline; the baseline is marked as forming until it freezes. A flat history, missing readings, mixed units or unusable variation produces no score. For each measurement, ten index points means one baseline standard deviation, **not 10%**.
+
+BODY shows the average of available eligible measurement indices for the database's current day, with coverage. Hover over the score to see which measurements count and which do not. This is a display of movement relative to your chosen rules, not a health rating. The index applies recorded corrections and voids; the raw graph continues to show the original readings.
+
+No new SQL is needed for this update if the existing setup is complete. Photo visibility and direction changes append events under the signed-in account; they never update or delete a row.
 
 ## One record, different inputs
 
@@ -62,6 +73,8 @@ Photo context contains `area: "body"`, `schema_version: 1`, `bucket: "body-progr
 
 Upload the photo with `upsert: false`, confirm the stored object, then append its event. Reuse the same upload path and source ID when retrying that operation. If upload succeeds but the event fails, retain that pending operation so a retry can finish it; do not replace the image or claim the check-in was saved. The browser downloads photos with authentication into temporary Blob URLs and releases them on sign-out.
 
+Photo removal and restoration append `event_type: "photo_visibility"`, `metric: "body_progress"`, `value: null`, `unit: null`, and `context: { "photo_id": "the original photo event ID", "hidden": true }` (or `false` to restore). The latest event by `recorded_at`, then `id`, controls that exact photo. The page uses `source: "pad"` and a stable `source_id` for retries. No Storage object is changed.
+
 Future MCP writes use `source: "claude"`: show the exact proposed rows and save only after the user's approval. Future direct Shortcut writes use `source: "shortcut"`. Both supply the authenticated user's ID and reuse an operation ID for uncertain retries. An assistant transcribes a supplied reading; it never invents a measurement or infers weight from a photo.
 
 ## If access fails
@@ -76,9 +89,5 @@ grant select, insert on public.events to authenticated;
 Keep row-level security enabled. Only a publishable key belongs in this page; never use a secret or service-role key.
 
 Local preview (Node.js 22+): copy `.env.example` to `.env.local`, fill in the two public settings, then run `node --env-file=.env.local dev.js` and open `http://localhost:8797`. The preview serves the page and `/api/config`; an ordinary static file server cannot provide the connection settings. `.env.local` is ignored by Git.
-
-## Film this
-
-> “This is the output. I log my weight, it becomes a point on my graph, and the reading stays underneath. Over time I can add progress photos. Later, my assistant and a phone shortcut can feed the same record.”
 
 [Supabase private buckets](https://supabase.com/docs/guides/storage/buckets/fundamentals) · [Storage access policies](https://supabase.com/docs/guides/storage/security/access-control) · [Upload](https://supabase.com/docs/reference/javascript/file-buckets-upload) · [Private download](https://supabase.com/docs/reference/javascript/file-buckets-download) · [Public API keys](https://supabase.com/docs/guides/api/api-keys)
