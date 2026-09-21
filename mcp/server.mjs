@@ -1,9 +1,10 @@
 // BODY over MCP. Claude reads your readings, and writes only the one you gave it.
 //
-// Three tools, and one door beside them: api/photo.mjs takes a photo from the
+// Four tools, and one door beside them: api/photo.mjs takes a photo from the
 // phone and writes its progress_photo row through the same sign-in.
-// record writes one events row, exactly as the page would, signed
-// source 'claude'. estimate writes a guess Claude read off a photo the user
+// record writes one events row for any metric the user names, exactly as the
+// page would, signed source 'claude'. list names every metric already in the
+// record, so a new name is never made where an old one will do. estimate writes a guess Claude read off a photo the user
 // sent, signed source 'photo', under a name ending _est, so an estimate and a
 // measurement can never be taken for one another. history reads one metric
 // back. There is no update and no delete. It signs in as you with the publishable key, so the same row level
@@ -19,7 +20,7 @@ import { z } from 'zod';
 import { supabaseUrl, publishableKey, isPublishable, login, missing } from './env.mjs';
 
 export const SOURCE = 'claude';
-export const VERSION = '1.1.0';
+export const VERSION = '1.2.0';
 
 // The ways one number reaches the record, and the whole of the difference
 // between them. A number the user gave is a measurement, signed claude. A
@@ -44,6 +45,11 @@ const NUMBER = /^[+]?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?$/i;
 const WEIGHT_UNITS = ['kg', 'lbs'];
 const FUTURE_SLACK = 60000;
 const CONTEXT = { area: 'body', schema_version: 1 };
+// A metric that is not weight goes on the BODY page only when the user puts it there. Anything
+// else is in the record, in history and in list, and nowhere on that page's graph.
+const AREA = /^[a-z][a-z0-9_]*$/;
+export const contextFor = (metric, area) => metric === 'weight' || area === 'body' ? CONTEXT
+  : area ? { area, schema_version: 1 } : { schema_version: 1 };
 const PAGE = 1000;
 
 // The page's name rule: lower case, anything else an underscore.
@@ -52,9 +58,10 @@ export const slug = s => String(s).toLowerCase().trim().replace(/[^a-z0-9]+/g, '
 // The row as the page would write it, or why nothing can be written. Asking
 // this writes nothing. value is kept as the text the user gave, so 158.0 stays
 // 158.0 in the numeric column, as it does from the page's input field.
-export function draftRow({ metric, value, unit, occurred_at }, now = Date.now(), writer = WRITERS.record) {
+export function draftRow({ metric, value, unit, occurred_at, area }, now = Date.now(), writer = WRITERS.record) {
   const m = slug(metric);
   if (!m) return { error: 'metric is empty' };
+  if (area != null && area !== '' && !AREA.test(String(area))) return { error: 'area is a lowercase word, like body, or left out' };
   const badName = writer.name(m);
   if (badName) return { error: badName };
   const text = typeof value === 'number' ? String(value) : String(value ?? '').trim();
@@ -158,7 +165,7 @@ export async function writeReading(input) {
   const drafted = draftRow(input);
   if (drafted.error) return { error: 'nothing written: ' + drafted.error };
   const { db, who } = await signIn();
-  const out = await insertOne(db, who, drafted.row, WRITERS.record, CONTEXT);
+  const out = await insertOne(db, who, drafted.row, WRITERS.record, contextFor(drafted.row.metric, input.area || undefined));
   if (out.error) return { error: 'nothing written: ' + out.error };
   return out.already_saved ? { ...out, say: 'this exact reading was already in your record; nothing new was written' } : out;
 }
@@ -188,14 +195,45 @@ export async function readHistory(metric, days) {
   const rows = await readAll(() => db.from('events').select('id,metric,value::text,unit,occurred_at,recorded_at,source,context')
     .eq('user_id', who).eq('event_type', 'measurement').eq('metric', m).gte('occurred_at', from)
     .order('occurred_at', { ascending: true }).order('id', { ascending: true }));
-  // the same filter the page's graph applies: recorded values of weight, or of a BODY measurement
-  const readings = rows.filter(r => r.value !== null && (r.metric === 'weight' || r.context?.area === 'body'))
+  // every recorded value of the metric; the BODY page shows only weight and area body, and says so here
+  const readings = rows.filter(r => r.value !== null)
     .map(({ id, value, unit, occurred_at, recorded_at, source }) => ({ id, value, unit, occurred_at, recorded_at, source }));
   const units = [...new Set(readings.map(r => r.unit))];
+  const areas = [...new Set(rows.map(r => r.context?.area).filter(Boolean))];
   const estimate = /_est$/.test(m);
-  return { metric: m, days, since: from, readings: readings.length, units, rows: readings,
+  return { metric: m, days, since: from, readings: readings.length, units, ...(areas.length ? { area: areas.length === 1 ? areas[0] : areas } : {}),
+    on_body_page: m === 'weight' || areas.includes('body'), rows: readings,
     ...(estimate ? { estimate: true, note: 'these are guesses read from photos, not measurements; say so whenever you show them' } : {}),
     ...(units.length > 1 ? { note: 'readings in different units are separate series, as on the page; they are not converted' } : {}) };
+}
+
+// Every metric in the record, once each: its units, how many readings, the latest one, and where
+// it shows. Read before a new name is made, so an old name is reused instead. Latest is by when
+// it was measured, then by when it was saved, as the page orders a series.
+export async function listMetrics() {
+  const { db, who } = await signIn();
+  const rows = await readAll(() => db.from('events').select('id,metric,value::text,unit,occurred_at,recorded_at,source,context')
+    .eq('user_id', who).eq('event_type', 'measurement').not('value', 'is', null)
+    .order('occurred_at', { ascending: true }).order('recorded_at', { ascending: true }).order('id', { ascending: true }));
+  const by = new Map();
+  for (const r of rows) {
+    const m = by.get(r.metric) || { metric: r.metric, units: [], readings: 0, sources: [], areas: [], latest: null };
+    m.readings++;
+    if (!m.units.includes(r.unit)) m.units.push(r.unit);
+    if (!m.sources.includes(r.source)) m.sources.push(r.source);
+    const area = r.context?.area; if (area && !m.areas.includes(area)) m.areas.push(area);
+    m.latest = { value: r.value, unit: r.unit, occurred_at: r.occurred_at, source: r.source };
+    by.set(r.metric, m);
+  }
+  const metrics = [...by.values()].sort((a, b) => a.metric.localeCompare(b.metric)).map(m => ({
+    metric: m.metric, unit: m.units.length === 1 ? m.units[0] : m.units, readings: m.readings, latest: m.latest, sources: m.sources,
+    ...(m.areas.length ? { area: m.areas.length === 1 ? m.areas[0] : m.areas } : {}),
+    on_body_page: m.metric === 'weight' || m.areas.includes('body'),
+    ...(/_est$/.test(m.metric) ? { estimate: true } : {})
+  }));
+  return { metrics: metrics.length, rows: metrics,
+    say: metrics.length ? 'reuse one of these names and its unit for anything it already carries; a new metric is a cost, not a free addition'
+                        : 'nothing recorded yet' };
 }
 
 export function bodyServer() {
@@ -207,6 +245,11 @@ export function bodyServer() {
       'is missing, ask for it; silence over a guess. Before any write, call record without confirmed to get ' +
       'the exact row, print that row to the user, and call record again with confirmed true only after the ' +
       'user says yes. Read history before asking for anything already in it. ' +
+      'record takes any metric the user names, not only body measurements: the name in lowercase with ' +
+      'underscores, the value exactly as given, and the unit the user said. Before recording under a name ' +
+      'you have not seen in this conversation, call list and reuse an existing name and unit if one ' +
+      'already carries that fact; never make a near-duplicate of a metric that exists. A new metric is a ' +
+      'cost, not a free addition. Weight stays as it is: unit kg or lbs, always on the BODY page. ' +
       'A number you read off a photo the user sent is not a measurement: it goes through estimate, never ' +
       'record, under a name ending _est and signed photo. An estimate is a guess. Say so every time you ' +
       'show or mention one, and never present it as a measurement or beside one as if it were. estimate ' +
@@ -218,8 +261,12 @@ export function bodyServer() {
   server.tool(
     'record',
     'Write one reading the user gave as one events row: event_type measurement, source claude, the same ' +
-    'shape the BODY page writes. metric is weight (unit kg or lbs) or another body measurement with the ' +
-    'unit the user named; a name ending _est is refused, because that is an estimate and goes through estimate. value is the number exactly as the user said it. occurred_at is when the user ' +
+    'shape the BODY page writes. metric is any name the user gives, written in lowercase with underscores: ' +
+    'weight (unit kg or lbs) or anything else with the unit the user named. Call list first for a name you ' +
+    'have not seen in this conversation and reuse an existing one instead of making a duplicate. ' +
+    'area is optional: body puts the metric on the BODY page beside weight; left out, the reading is in ' +
+    'the record and in history but not on that page. A name ending _est is refused, because that is an ' +
+    'estimate and goes through estimate. value is the number exactly as the user said it. occurred_at is when the user ' +
     'measured, as an ISO 8601 timestamp with its zone; ask if unsure, and never use a future time. ' +
     'Without confirmed, nothing is written: the exact row is returned for you to print to the user. ' +
     'Pass confirmed true only after the user has seen that row and said yes. Never call this with a ' +
@@ -229,19 +276,33 @@ export function bodyServer() {
       value: z.union([z.number(), z.string()]),
       unit: z.string(),
       occurred_at: z.string(),
+      area: z.string().optional(),
       confirmed: z.boolean().optional()
     },
-    async ({ metric, value, unit, occurred_at, confirmed = false }) => {
+    async ({ metric, value, unit, occurred_at, area, confirmed = false }) => {
       if (!confirmed) {
-        const drafted = draftRow({ metric, value, unit, occurred_at });
+        const drafted = draftRow({ metric, value, unit, occurred_at, area });
         if (drafted.error) return fail({ error: 'nothing written: ' + drafted.error });
-        return text({ proposed: { ...drafted.row, source: SOURCE, event_type: 'measurement', context: CONTEXT },
+        return text({ proposed: { ...drafted.row, source: SOURCE, event_type: 'measurement', context: contextFor(drafted.row.metric, area || undefined) },
           say: 'nothing written yet. Print this row to the user; call record again with confirmed true only if they say yes' });
       }
       try {
-        const out = await writeReading({ metric, value, unit, occurred_at });
+        const out = await writeReading({ metric, value, unit, occurred_at, area });
         return out.error ? fail(out) : text(out);
       } catch (e) { return fail({ error: 'nothing written: ' + e.message }); }
+    }
+  );
+
+  server.tool(
+    'list',
+    'Every metric already in the record, once each, sorted by name: its unit, how many readings, the ' +
+    'latest reading with when it was measured, which inputs wrote it, and whether it shows on the BODY ' +
+    'page. Call it before recording under a name you have not seen in this conversation, and reuse an ' +
+    'existing name and unit instead of making a duplicate. It writes nothing.',
+    {},
+    async () => {
+      try { return text(await listMetrics()); }
+      catch (e) { return fail({ error: e.message }); }
     }
   );
 
