@@ -1,8 +1,10 @@
 // BODY over MCP. Claude reads your readings, and writes only the one you gave it.
 //
-// Two tools. record writes one events row, exactly as the page would, signed
-// source 'claude'. history reads one metric back. There is no update and no
-// delete. It signs in as you with the publishable key, so the same row level
+// Three tools. record writes one events row, exactly as the page would, signed
+// source 'claude'. estimate writes a guess Claude read off a photo the user
+// sent, signed source 'photo', under a name ending _est, so an estimate and a
+// measurement can never be taken for one another. history reads one metric
+// back. There is no update and no delete. It signs in as you with the publishable key, so the same row level
 // security that protects the page protects this.
 //
 // This file is the server and both tools, defined once. api/mcp.mjs serves it
@@ -15,7 +17,25 @@ import { z } from 'zod';
 import { supabaseUrl, publishableKey, isPublishable, login, missing } from './env.mjs';
 
 export const SOURCE = 'claude';
-export const VERSION = '1.0.0';
+export const VERSION = '1.1.0';
+
+// The ways one number reaches the record, and the whole of the difference
+// between them. A number the user gave is a measurement, signed claude. A
+// number Claude read off a picture is an estimate: signed photo, never claude,
+// its name ending _est, and carrying the model that read it. Neither ever
+// takes the other's name or source: the table has no delete, so a series that
+// mixed the two could never be untangled again.
+export const WRITERS = {
+  record: { source: 'claude', name: m => /_est$/.test(m) ? 'a name ending _est is an estimate\'s; a number the user gave is a measurement and goes under its own name' : null },
+  estimate: { source: 'photo', name: m => /_est$/.test(m) ? null : 'an estimate\'s name must end _est, so it can never be taken for something measured' }
+};
+
+// The estimates a photo can yield, each with the one unit it is written in and
+// the values that can be read at all. Nothing else goes through estimate.
+export const ESTIMATES = {
+  bodyfat_est: { unit: 'percent', check: v => v > 0 && v < 100 ? null : 'bodyfat_est is a percent between 0 and 100' },
+  muscle_est: { unit: '1-10', check: v => Number.isInteger(v) && v >= 1 && v <= 10 ? null : 'muscle_est is a whole number rating from 1 to 10' }
+};
 
 // The same rules the page applies in readingDraft() and readingTime() in index.html.
 const NUMBER = /^[+]?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?$/i;
@@ -30,9 +50,11 @@ export const slug = s => String(s).toLowerCase().trim().replace(/[^a-z0-9]+/g, '
 // The row as the page would write it, or why nothing can be written. Asking
 // this writes nothing. value is kept as the text the user gave, so 158.0 stays
 // 158.0 in the numeric column, as it does from the page's input field.
-export function draftRow({ metric, value, unit, occurred_at }, now = Date.now()) {
+export function draftRow({ metric, value, unit, occurred_at }, now = Date.now(), writer = WRITERS.record) {
   const m = slug(metric);
   if (!m) return { error: 'metric is empty' };
+  const badName = writer.name(m);
+  if (badName) return { error: badName };
   const text = typeof value === 'number' ? String(value) : String(value ?? '').trim();
   if (!NUMBER.test(text) || !Number.isFinite(Number(text)) || Number(text) <= 0) return { error: 'value must be a number greater than zero, exactly as the user gave it' };
   const u = String(unit ?? '').trim();
@@ -42,6 +64,29 @@ export function draftRow({ metric, value, unit, occurred_at }, now = Date.now())
   if (!Number.isFinite(t)) return { error: 'occurred_at must be an ISO 8601 timestamp with its zone, the time the user measured' };
   if (t > now + FUTURE_SLACK) return { error: 'occurred_at is in the future; use the time this happened' };
   return { row: { metric: m, value: text, unit: u, occurred_at: new Date(t).toISOString() } };
+}
+
+// The estimate rows as they would land, or why nothing can be written. Each
+// takes the unit its name fixes, so a percent is never written as a rating.
+export function draftEstimates({ rows, occurred_at, model }, now = Date.now()) {
+  if (!Array.isArray(rows) || !rows.length) return { error: 'no rows' };
+  const out = [], seen = new Set();
+  for (const r of rows) {
+    const m = slug(r.metric);
+    const known = ESTIMATES[m];
+    if (!known) return { error: `${m || 'an empty name'} is not an estimate this tool writes; it writes ${Object.keys(ESTIMATES).join(' and ')}` };
+    if (typeof r.value !== 'number' || !Number.isFinite(r.value)) return { error: `${m}: the value is not a number` };
+    const bad = known.check(r.value);
+    if (bad) return { error: bad };
+    if (seen.has(m)) return { error: `${m} appears twice; one guess per photo` };
+    seen.add(m);
+    const drafted = draftRow({ metric: m, value: r.value, unit: known.unit, occurred_at }, now, WRITERS.estimate);
+    if (drafted.error) return { error: drafted.error };
+    out.push(drafted.row);
+  }
+  const who = String(model ?? '').trim();
+  if (!who) return { error: 'model is empty: name the model that read the photo' };
+  return { rows: out, context: { ...CONTEXT, estimate: true, model: who } };
 }
 
 // One save, one source_id: the same row asked twice, by a retry after an
@@ -86,19 +131,44 @@ async function readAll(query) {
   }
 }
 
+const COLUMNS = 'id,metric,value::text,unit,occurred_at,recorded_at,source';
+
+// One row into events, as the page writes it. A row already there, from a
+// retry of this exact row, is read back and never written again.
+async function insertOne(db, who, drafted, writer, context) {
+  const row = { ...drafted, user_id: who, source: writer.source, source_id: sourceIdOf(drafted), event_type: 'measurement', context };
+  const { data, error } = await db.from('events').insert(row).select(COLUMNS).single();
+  if (!error) return { written: data };
+  if (error.code !== '23505') return { error: error.message };
+  const { data: saved, error: readError } = await db.from('events').select(COLUMNS)
+    .eq('user_id', who).eq('source', writer.source).eq('source_id', row.source_id).eq('metric', row.metric).maybeSingle();
+  if (readError || !saved) return { error: readError ? readError.message : error.message };
+  return { already_saved: saved };
+}
+
 export async function writeReading(input) {
   const drafted = draftRow(input);
   if (drafted.error) return { error: 'nothing written: ' + drafted.error };
   const { db, who } = await signIn();
-  const row = { ...drafted.row, user_id: who, source: SOURCE, source_id: sourceIdOf(drafted.row), event_type: 'measurement', context: CONTEXT };
-  const { data, error } = await db.from('events').insert(row).select('id,metric,value::text,unit,occurred_at,recorded_at,source').single();
-  if (!error) return { written: data };
-  if (error.code !== '23505') return { error: 'nothing written: ' + error.message };
-  // Already there: a retry of this exact row. Confirm by reading it back, never write it again.
-  const { data: saved, error: readError } = await db.from('events').select('id,metric,value::text,unit,occurred_at,recorded_at,source')
-    .eq('user_id', who).eq('source', SOURCE).eq('source_id', row.source_id).eq('metric', row.metric).maybeSingle();
-  if (readError || !saved) return { error: 'nothing written: ' + (readError ? readError.message : error.message) };
-  return { already_saved: saved, say: 'this exact reading was already in your record; nothing new was written' };
+  const out = await insertOne(db, who, drafted.row, WRITERS.record, CONTEXT);
+  if (out.error) return { error: 'nothing written: ' + out.error };
+  return out.already_saved ? { ...out, say: 'this exact reading was already in your record; nothing new was written' } : out;
+}
+
+// Each estimate row goes in on its own, so one already there never stops the
+// others, and the answer names every row written, already saved, or refused.
+export async function writeEstimates(input) {
+  const drafted = draftEstimates(input);
+  if (drafted.error) return { error: 'nothing written: ' + drafted.error };
+  const { db, who } = await signIn();
+  const written = [], already_saved = [];
+  for (const row of drafted.rows) {
+    const out = await insertOne(db, who, row, WRITERS.estimate, drafted.context);
+    if (out.error) return { error: out.error, written, already_saved };
+    (out.written ? written : already_saved).push(out.written || out.already_saved);
+  }
+  return { estimate: true, written, already_saved,
+    say: 'these are guesses read from a photo, not measurements; say so whenever you show them' };
 }
 
 export async function readHistory(metric, days) {
@@ -114,7 +184,9 @@ export async function readHistory(metric, days) {
   const readings = rows.filter(r => r.value !== null && (r.metric === 'weight' || r.context?.area === 'body'))
     .map(({ id, value, unit, occurred_at, recorded_at, source }) => ({ id, value, unit, occurred_at, recorded_at, source }));
   const units = [...new Set(readings.map(r => r.unit))];
+  const estimate = /_est$/.test(m);
   return { metric: m, days, since: from, readings: readings.length, units, rows: readings,
+    ...(estimate ? { estimate: true, note: 'these are guesses read from photos, not measurements; say so whenever you show them' } : {}),
     ...(units.length > 1 ? { note: 'readings in different units are separate series, as on the page; they are not converted' } : {}) };
 }
 
@@ -126,14 +198,20 @@ export function bodyServer() {
       'estimate, round, convert, fill or infer one, and never read one off a photo. If a value, unit or time ' +
       'is missing, ask for it; silence over a guess. Before any write, call record without confirmed to get ' +
       'the exact row, print that row to the user, and call record again with confirmed true only after the ' +
-      'user says yes. Read history before asking for anything already in it.'
+      'user says yes. Read history before asking for anything already in it. ' +
+      'A number you read off a photo the user sent is not a measurement: it goes through estimate, never ' +
+      'record, under a name ending _est and signed photo. An estimate is a guess. Say so every time you ' +
+      'show or mention one, and never present it as a measurement or beside one as if it were. estimate ' +
+      'writes only bodyfat_est and muscle_est; it never writes weight or any metric without _est, and it ' +
+      'never changes or replaces a measured reading. The same confirm rule applies: print the exact rows ' +
+      'and write only after the user says yes.'
   });
 
   server.tool(
     'record',
     'Write one reading the user gave as one events row: event_type measurement, source claude, the same ' +
     'shape the BODY page writes. metric is weight (unit kg or lbs) or another body measurement with the ' +
-    'unit the user named. value is the number exactly as the user said it. occurred_at is when the user ' +
+    'unit the user named; a name ending _est is refused, because that is an estimate and goes through estimate. value is the number exactly as the user said it. occurred_at is when the user ' +
     'measured, as an ISO 8601 timestamp with its zone; ask if unsure, and never use a future time. ' +
     'Without confirmed, nothing is written: the exact row is returned for you to print to the user. ' +
     'Pass confirmed true only after the user has seen that row and said yes. Never call this with a ' +
@@ -154,6 +232,37 @@ export function bodyServer() {
       }
       try {
         const out = await writeReading({ metric, value, unit, occurred_at });
+        return out.error ? fail(out) : text(out);
+      } catch (e) { return fail({ error: 'nothing written: ' + e.message }); }
+    }
+  );
+
+  server.tool(
+    'estimate',
+    'Write guesses you read off a photo the user sent in this chat, one events row each, signed source ' +
+    'photo, event_type measurement, under names ending _est so they can never be taken for measurements. ' +
+    'Only bodyfat_est (unit percent, a number between 0 and 100) and muscle_est (unit 1-10, a whole-number ' +
+    'rating) are written. It never writes weight or any metric without _est, and it never changes or ' +
+    'replaces a measured reading. occurred_at is when the photo was taken, as an ISO 8601 timestamp with ' +
+    'its zone; ask if unsure. model is the name of the model reading the photo. Without confirmed, ' +
+    'nothing is written: the exact rows are returned for you to print to the user, saying they are ' +
+    'guesses. Pass confirmed true only after the user has seen those rows and said yes. An estimate is ' +
+    'a guess: say so every time, and never present it as a measurement.',
+    {
+      rows: z.array(z.object({ metric: z.string(), value: z.number() })).min(1),
+      occurred_at: z.string(),
+      model: z.string(),
+      confirmed: z.boolean().optional()
+    },
+    async ({ rows, occurred_at, model, confirmed = false }) => {
+      if (!confirmed) {
+        const drafted = draftEstimates({ rows, occurred_at, model });
+        if (drafted.error) return fail({ error: 'nothing written: ' + drafted.error });
+        return text({ estimate: true, proposed: drafted.rows.map(r => ({ ...r, source: WRITERS.estimate.source, event_type: 'measurement', context: drafted.context })),
+          say: 'nothing written yet. Print these rows to the user as guesses read from the photo, not measurements; call estimate again with confirmed true only if they say yes' });
+      }
+      try {
+        const out = await writeEstimates({ rows, occurred_at, model });
         return out.error ? fail(out) : text(out);
       } catch (e) { return fail({ error: 'nothing written: ' + e.message }); }
     }

@@ -40,7 +40,9 @@ The optional SQL is safe to rerun. It stops if an existing bucket has incompatib
 2. In claude.ai, under Settings → Connectors, add a custom connector with the URL `https://YOUR-PAGE.vercel.app/api/mcp`, choose no sign-in, and add the header `Authorization` with the value `Bearer ` followed by your token.
 3. On your phone, tell Claude: **"log my weight, 158"**. Claude asks anything it does not know (kg or lbs, when you measured), shows you the exact row, and saves it only after you say yes. Refresh BODY: the reading is on the graph, marked **MCP**.
 
-The endpoint has two tools. **record** takes `metric`, `value`, `unit` and `occurred_at`; called without confirmation it returns the exact row and writes nothing, and it writes only when called again with `confirmed: true` after your yes. **history** takes `metric` and `days` and reads your readings back. Claude transcribes a number you gave it; it never estimates, rounds, converts or invents one. There is no update and no delete.
+The endpoint has three tools. **record** takes `metric`, `value`, `unit` and `occurred_at`; called without confirmation it returns the exact row and writes nothing, and it writes only when called again with `confirmed: true` after your yes. **history** takes `metric` and `days` and reads your readings back. Claude transcribes a number you gave it; it never estimates, rounds, converts or invents one. There is no update and no delete.
+
+**estimate** is for a photo you send in the chat. Claude reads a guess off it, `bodyfat_est` (percent) and `muscle_est` (a 1 to 10 rating), and writes it with `source: "photo"` and the name of the model that read it. The same confirm rule applies: the exact rows first, a write only after your yes. An estimate is a guess, and Claude is told to say so every time and never to present one as a measurement. The tool writes only names ending `_est`, never weight or any measured metric, and never changes or replaces a measured reading; `record` refuses `_est` names in turn, so the two can never mix. On the page an estimate is its own entry in the measurement picker, labelled **estimate**, and never appears on the weight line.
 
 Every request must carry `WIRE_TOKEN`; without the token, or with `WIRE_TOKEN` unset, nothing gets in. Row-level security still applies, because the endpoint holds only the publishable key and your own login. Treat the token like a password: anyone who has it can append to your record. Rotate it in Vercel if it leaks. The local preview also serves `/api/mcp` when the five settings are in `.env.local`, after `npm install`.
 
@@ -79,9 +81,9 @@ All inputs append to `public.events`. Read every page of history in a stable ord
 | `value` | User-supplied numeric value | `null` |
 | `unit` | `kg` or `lbs`, explicitly supplied | `null` |
 | `occurred_at` | User-confirmed measurement time | User-confirmed photo time |
-| `source` | `pad` for this page, `claude` for MCP | `pad` for this page |
+| `source` | `pad` for this page, `claude` for MCP, `photo` for an MCP estimate | `pad` for this page |
 | `source_id` | Stable ID for one save/retry | Stable UUID for one save/retry |
-| `context` | `{ "area": "body" }` | Fields below |
+| `context` | `{ "area": "body" }`; an estimate adds `estimate: true` and `model` | Fields below |
 
 Photo context contains `area: "body"`, `schema_version: 1`, `bucket: "body-progress"`, `path`, `mime_type`, `bytes` and `sha256`. The path is `<authenticated user ID>/<upload UUID>.<extension>`; it references a private Storage object. Do not store photo bytes, public URLs or expiring signed URLs in the event.
 
@@ -89,7 +91,7 @@ Upload the photo with `upsert: false`, confirm the stored object, then append it
 
 Photo removal and restoration append `event_type: "photo_visibility"`, `metric: "body_progress"`, `value: null`, `unit: null`, and `context: { "photo_id": "the original photo event ID", "hidden": true }` (or `false` to restore). The latest event by `recorded_at`, then `id`, controls that exact photo. The page uses `source: "pad"` and a stable `source_id` for retries. No Storage object is changed.
 
-MCP writes use `source: "claude"`: the tool returns the exact proposed row first and saves only after the user's approval. Its `source_id` is derived from the row itself, so an uncertain retry of the same reading lands once and a different reading is a new row. Future direct Shortcut writes use `source: "shortcut"`. Both supply the authenticated user's ID. An assistant transcribes a supplied reading; it never invents a measurement or infers weight from a photo.
+MCP writes use `source: "claude"`: the tool returns the exact proposed row first and saves only after the user's approval. An MCP estimate uses `source: "photo"` and a metric ending `_est`; a measurement never takes either. Its `source_id` is derived from the row itself, so an uncertain retry of the same reading lands once and a different reading is a new row. Future direct Shortcut writes use `source: "shortcut"`. Both supply the authenticated user's ID. An assistant transcribes a supplied reading; it never invents a measurement or infers weight from a photo.
 
 ## If access fails
 

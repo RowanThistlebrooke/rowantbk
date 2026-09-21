@@ -220,7 +220,7 @@ async function loadHistory(preferred=''){
     for(const group of groups.values()) group.sort((a,b) => a.occurred_at.localeCompare(b.occurred_at) || a.id.localeCompare(b.id));
     if(preferred && groups.has(preferred)) selected=preferred;
     if(!groups.has(selected)){ const weight=rows.filter(row=>row.metric==='weight'); selected=weight.length?seriesKey(weight.at(-1)):rows.length?seriesKey(rows.at(-1)):''; }
-    $('history-select').innerHTML=[...groups].sort((a,b)=>a[1][0].metric.localeCompare(b[1][0].metric)).map(([key,group])=>`<option value="${escapeHTML(key)}"${key===selected?' selected':''}>${escapeHTML(displayName(group[0].metric))}${group[0].unit?' · '+escapeHTML(group[0].unit):' · no unit'}</option>`).join('');
+    $('history-select').innerHTML=[...groups].sort((a,b)=>a[1][0].metric.localeCompare(b[1][0].metric)).map(([key,group])=>`<option value="${escapeHTML(key)}"${key===selected?' selected':''}>${escapeHTML(displayName(group[0].metric))}${group[0].metric.endsWith('_est')?' · estimate':''}${group[0].unit?' · '+escapeHTML(group[0].unit):' · no unit'}</option>`).join('');
     $('history-picker').hidden=groups.size<2; drawHistory(); drawPhotos(result.filter(row=>row.event_type==='progress_photo' && row.metric==='body_progress'),result.filter(row=>row.event_type==='photo_visibility')); message('history-message',''); return true;
   } catch(error){
     if(version!==generation || thisRequest!==request) return false;
