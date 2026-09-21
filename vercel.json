@@ -2,6 +2,9 @@
   "functions": {
     "api/mcp.mjs": {
       "maxDuration": 30
+    },
+    "api/photo.mjs": {
+      "maxDuration": 30
     }
   }
 }

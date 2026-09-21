@@ -1,6 +1,8 @@
 // BODY over MCP. Claude reads your readings, and writes only the one you gave it.
 //
-// Three tools. record writes one events row, exactly as the page would, signed
+// Three tools, and one door beside them: api/photo.mjs takes a photo from the
+// phone and writes its progress_photo row through the same sign-in.
+// record writes one events row, exactly as the page would, signed
 // source 'claude'. estimate writes a guess Claude read off a photo the user
 // sent, signed source 'photo', under a name ending _est, so an estimate and a
 // measurement can never be taken for one another. history reads one metric
@@ -115,6 +117,12 @@ async function signIn() {
   });
   return { db, who: await authed };
 }
+
+// The signed in client and the user's id, for a door that is not a tool:
+// /api/photo writes a file and a row through the same session the tools write
+// through. Signing in lives here once, so no door invents a second way to hold
+// the password.
+export const signedIn = () => signIn();
 
 const text = o => ({ content: [{ type: 'text', text: JSON.stringify(o, null, 2) }] });
 const fail = o => ({ ...text(o), isError: true });

@@ -40,6 +40,19 @@ The optional SQL is safe to rerun. It stops if an existing bucket has incompatib
 2. In claude.ai, under Settings → Connectors, add a custom connector with the URL `https://YOUR-PAGE.vercel.app/api/mcp`, choose no sign-in, and add the header `Authorization` with the value `Bearer ` followed by your token.
 3. On your phone, tell Claude: **"log my weight, 158"**. Claude asks anything it does not know (kg or lbs, when you measured), shows you the exact row, and saves it only after you say yes. Refresh BODY: the reading is on the graph, marked **MCP**.
 
+### Photo from an iOS Shortcut
+
+[api/photo.mjs](api/photo.mjs) is a door for one progress photo from your phone's share sheet, at `/api/photo`. It accepts the same request as The Wire's `/api/photo`, so the same Shortcut works against both: a POST with your token in the `Authorization` header and the image itself as the body. It signs in as you the way `/api/mcp` does, saves the file to the private `body-progress` bucket under a new path, and writes the `progress_photo` row exactly as the page does, so the photo shows under **Progress photos**, marked **Shortcut**. Run [photos.sql](photos.sql) first if you have not.
+
+1. In the Shortcuts app, make a new Shortcut and turn on **Show in Share Sheet**, accepting **Images**.
+2. Add **Convert Image** to **JPEG** (this also turns a HEIC photo into one the bucket accepts), then **Resize Image** to a width of about 1600 so it stays under 4 MB.
+3. Add **Get Contents of URL**: URL `https://YOUR-PAGE.vercel.app/api/photo`, method **POST**, a header `Authorization` with the value `Bearer ` followed by your `WIRE_TOKEN`, and request body **File** set to the converted image.
+4. Share a photo to the Shortcut. Refresh BODY: it is under Progress photos, timed at the moment it arrived.
+
+The token goes in the header and never in the address, because an address ends up in logs; a request with the token in the address is refused. Optionally set `WIRE_PHOTO_TOKEN` in Vercel to a second random string and put that in the Shortcut instead: it opens `/api/photo` only, so a token lost from a share sheet cannot drive the MCP. The door accepts JPEG, PNG and WebP up to 4 MB, never replaces a file or a row, and the same photo sent twice lands once.
+
+### The MCP tools
+
 The endpoint has three tools. **record** takes `metric`, `value`, `unit` and `occurred_at`; called without confirmation it returns the exact row and writes nothing, and it writes only when called again with `confirmed: true` after your yes. **history** takes `metric` and `days` and reads your readings back. Claude transcribes a number you gave it; it never estimates, rounds, converts or invents one. There is no update and no delete.
 
 **estimate** is for a photo you send in the chat. Claude reads a guess off it, `bodyfat_est` (percent) and `muscle_est` (a 1 to 10 rating), and writes it with `source: "photo"` and the name of the model that read it. The same confirm rule applies: the exact rows first, a write only after your yes. An estimate is a guess, and Claude is told to say so every time and never to present one as a measurement. The tool writes only names ending `_est`, never weight or any measured metric, and never changes or replaces a measured reading; `record` refuses `_est` names in turn, so the two can never mix. On the page an estimate is its own entry in the measurement picker, labelled **estimate**, and never appears on the weight line.
@@ -66,7 +79,7 @@ No new SQL is needed for this update if the existing setup is complete. Photo vi
 
 **Page → events → BODY.** The page and the MCP endpoint append to the same record; a future iOS input can too. They do not need another dashboard.
 
-The page implements manual weight logging and optional photo uploads. The MCP endpoint at `/api/mcp` logs readings through Claude. **An automated iOS logging Shortcut is not included yet.**
+The page implements manual weight logging and optional photo uploads. The MCP endpoint at `/api/mcp` logs readings through Claude, and `/api/photo` takes a progress photo from an iOS Shortcut. **An automated iOS Shortcut for weight readings is not included yet.**
 
 A simple optional iOS Shortcut can use **Open URLs** with your deployed page's `/?log=weight` address, then be [added to your Home Screen](https://support.apple.com/guide/shortcuts/apd735880972/ios). The page opens weight entry after sign-in; you still enter and save the reading yourself. Put no keys, passwords or tokens in that URL. This repository does not create or install the Shortcut.
 
@@ -80,8 +93,8 @@ All inputs append to `public.events`. Read every page of history in a stable ord
 | `metric` | `weight` | `body_progress` |
 | `value` | User-supplied numeric value | `null` |
 | `unit` | `kg` or `lbs`, explicitly supplied | `null` |
-| `occurred_at` | User-confirmed measurement time | User-confirmed photo time |
-| `source` | `pad` for this page, `claude` for MCP, `photo` for an MCP estimate | `pad` for this page |
+| `occurred_at` | User-confirmed measurement time | User-confirmed photo time; the moment it arrived for `/api/photo` |
+| `source` | `pad` for this page, `claude` for MCP, `photo` for an MCP estimate | `pad` for this page, `shortcut` for `/api/photo` |
 | `source_id` | Stable ID for one save/retry | Stable UUID for one save/retry |
 | `context` | `{ "area": "body" }`; an estimate adds `estimate: true` and `model` | Fields below |
 
@@ -91,7 +104,7 @@ Upload the photo with `upsert: false`, confirm the stored object, then append it
 
 Photo removal and restoration append `event_type: "photo_visibility"`, `metric: "body_progress"`, `value: null`, `unit: null`, and `context: { "photo_id": "the original photo event ID", "hidden": true }` (or `false` to restore). The latest event by `recorded_at`, then `id`, controls that exact photo. The page uses `source: "pad"` and a stable `source_id` for retries. No Storage object is changed.
 
-MCP writes use `source: "claude"`: the tool returns the exact proposed row first and saves only after the user's approval. An MCP estimate uses `source: "photo"` and a metric ending `_est`; a measurement never takes either. Its `source_id` is derived from the row itself, so an uncertain retry of the same reading lands once and a different reading is a new row. Future direct Shortcut writes use `source: "shortcut"`. Both supply the authenticated user's ID. An assistant transcribes a supplied reading; it never invents a measurement or infers weight from a photo.
+MCP writes use `source: "claude"`: the tool returns the exact proposed row first and saves only after the user's approval. An MCP estimate uses `source: "photo"` and a metric ending `_est`; a measurement never takes either. Its `source_id` is derived from the row itself, so an uncertain retry of the same reading lands once and a different reading is a new row. The photo door's writes use `source: "shortcut"` and the upload UUID as `source_id`; a future Shortcut for readings would too. All supply the authenticated user's ID. An assistant transcribes a supplied reading; it never invents a measurement or infers weight from a photo.
 
 ## If access fails
 
@@ -104,6 +117,6 @@ grant select, insert on public.events to authenticated;
 
 Keep row-level security enabled. Only a publishable key belongs in this page; never use a secret or service-role key.
 
-Local preview (Node.js 22+): copy `.env.example` to `.env.local`, fill in the two public settings, then run `node --env-file=.env.local dev.js` and open `http://localhost:8797`. The preview serves the page and `/api/config`, and `/api/mcp` once you run `npm install` and fill in the three `WIRE_…` settings; an ordinary static file server cannot provide the connection settings. `.env.local` is ignored by Git.
+Local preview (Node.js 22+): copy `.env.example` to `.env.local`, fill in the two public settings, then run `node --env-file=.env.local dev.js` and open `http://localhost:8797`. The preview serves the page and `/api/config`, and `/api/mcp` and `/api/photo` once you run `npm install` and fill in the three `WIRE_…` settings; an ordinary static file server cannot provide the connection settings. `.env.local` is ignored by Git.
 
 [Supabase private buckets](https://supabase.com/docs/guides/storage/buckets/fundamentals) · [Storage access policies](https://supabase.com/docs/guides/storage/security/access-control) · [Upload](https://supabase.com/docs/reference/javascript/file-buckets-upload) · [Private download](https://supabase.com/docs/reference/javascript/file-buckets-download) · [Public API keys](https://supabase.com/docs/guides/api/api-keys)
