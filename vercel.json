@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "api/mcp.mjs": {
+      "maxDuration": 30
+    }
+  }
+}

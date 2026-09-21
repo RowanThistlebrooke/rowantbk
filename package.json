@@ -1,0 +1,11 @@
+{
+  "name": "body",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Only for the MCP function in api/mcp.mjs. The page has no dependencies and no build step.",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.30.0",
+    "@supabase/supabase-js": "2.116.0",
+    "zod": "4.6.4"
+  }
+}
