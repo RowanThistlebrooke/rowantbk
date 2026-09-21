@@ -20,7 +20,7 @@ import { z } from 'zod';
 import { supabaseUrl, publishableKey, isPublishable, login, missing } from './env.mjs';
 
 export const SOURCE = 'claude';
-export const VERSION = '1.2.0';
+export const VERSION = '1.3.0';
 
 // The ways one number reaches the record, and the whole of the difference
 // between them. A number the user gave is a measurement, signed claude. A
@@ -45,11 +45,14 @@ const NUMBER = /^[+]?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?$/i;
 const WEIGHT_UNITS = ['kg', 'lbs'];
 const FUTURE_SLACK = 60000;
 const CONTEXT = { area: 'body', schema_version: 1 };
-// A metric that is not weight goes on the BODY page only when the user puts it there. Anything
-// else is in the record, in history and in list, and nowhere on that page's graph.
-const AREA = /^[a-z][a-z0-9_]*$/;
-export const contextFor = (metric, area) => metric === 'weight' || area === 'body' ? CONTEXT
-  : area ? { area, schema_version: 1 } : { schema_version: 1 };
+// Where a reading shows. body is the BODY page, gym the GYM page; a metric with neither is in the
+// record, in history and in list, and on no page's graph. Weight is always body. reps, for a lift,
+// is kept beside the value in context and shown under each reading on the GYM page.
+export const AREAS = ['body', 'gym'];
+export const contextFor = (metric, area, reps) => {
+  const where = metric === 'weight' ? 'body' : area || null;
+  return { ...(where ? { area: where } : {}), ...(reps != null ? { reps } : {}), schema_version: 1 };
+};
 const PAGE = 1000;
 
 // The page's name rule: lower case, anything else an underscore.
@@ -58,10 +61,11 @@ export const slug = s => String(s).toLowerCase().trim().replace(/[^a-z0-9]+/g, '
 // The row as the page would write it, or why nothing can be written. Asking
 // this writes nothing. value is kept as the text the user gave, so 158.0 stays
 // 158.0 in the numeric column, as it does from the page's input field.
-export function draftRow({ metric, value, unit, occurred_at, area }, now = Date.now(), writer = WRITERS.record) {
+export function draftRow({ metric, value, unit, occurred_at, area, reps }, now = Date.now(), writer = WRITERS.record) {
   const m = slug(metric);
   if (!m) return { error: 'metric is empty' };
-  if (area != null && area !== '' && !AREA.test(String(area))) return { error: 'area is a lowercase word, like body, or left out' };
+  if (area != null && area !== '' && !AREAS.includes(area)) return { error: `area is ${AREAS.join(' or ')}, or left out` };
+  if (reps != null && !(Number.isInteger(reps) && reps > 0)) return { error: 'reps is a whole number greater than zero, exactly as the user said, or left out' };
   const badName = writer.name(m);
   if (badName) return { error: badName };
   const text = typeof value === 'number' ? String(value) : String(value ?? '').trim();
@@ -72,7 +76,7 @@ export function draftRow({ metric, value, unit, occurred_at, area }, now = Date.
   const t = Date.parse(String(occurred_at ?? ''));
   if (!Number.isFinite(t)) return { error: 'occurred_at must be an ISO 8601 timestamp with its zone, the time the user measured' };
   if (t > now + FUTURE_SLACK) return { error: 'occurred_at is in the future; use the time this happened' };
-  return { row: { metric: m, value: text, unit: u, occurred_at: new Date(t).toISOString() } };
+  return { row: { metric: m, value: text, unit: u, occurred_at: new Date(t).toISOString() }, context: contextFor(m, area || undefined, reps ?? undefined) };
 }
 
 // The estimate rows as they would land, or why nothing can be written. Each
@@ -146,7 +150,7 @@ async function readAll(query) {
   }
 }
 
-const COLUMNS = 'id,metric,value::text,unit,occurred_at,recorded_at,source';
+const COLUMNS = 'id,metric,value::text,unit,occurred_at,recorded_at,source,context';
 
 // One row into events, as the page writes it. A row already there, from a
 // retry of this exact row, is read back and never written again.
@@ -165,7 +169,7 @@ export async function writeReading(input) {
   const drafted = draftRow(input);
   if (drafted.error) return { error: 'nothing written: ' + drafted.error };
   const { db, who } = await signIn();
-  const out = await insertOne(db, who, drafted.row, WRITERS.record, contextFor(drafted.row.metric, input.area || undefined));
+  const out = await insertOne(db, who, drafted.row, WRITERS.record, drafted.context);
   if (out.error) return { error: 'nothing written: ' + out.error };
   return out.already_saved ? { ...out, say: 'this exact reading was already in your record; nothing new was written' } : out;
 }
@@ -197,12 +201,12 @@ export async function readHistory(metric, days) {
     .order('occurred_at', { ascending: true }).order('id', { ascending: true }));
   // every recorded value of the metric; the BODY page shows only weight and area body, and says so here
   const readings = rows.filter(r => r.value !== null)
-    .map(({ id, value, unit, occurred_at, recorded_at, source }) => ({ id, value, unit, occurred_at, recorded_at, source }));
+    .map(({ id, value, unit, occurred_at, recorded_at, source, context }) => ({ id, value, unit, ...(context?.reps != null ? { reps: context.reps } : {}), occurred_at, recorded_at, source }));
   const units = [...new Set(readings.map(r => r.unit))];
   const areas = [...new Set(rows.map(r => r.context?.area).filter(Boolean))];
   const estimate = /_est$/.test(m);
   return { metric: m, days, since: from, readings: readings.length, units, ...(areas.length ? { area: areas.length === 1 ? areas[0] : areas } : {}),
-    on_body_page: m === 'weight' || areas.includes('body'), rows: readings,
+    on_body_page: m === 'weight' || areas.includes('body'), on_gym_page: areas.includes('gym'), rows: readings,
     ...(estimate ? { estimate: true, note: 'these are guesses read from photos, not measurements; say so whenever you show them' } : {}),
     ...(units.length > 1 ? { note: 'readings in different units are separate series, as on the page; they are not converted' } : {}) };
 }
@@ -222,13 +226,13 @@ export async function listMetrics() {
     if (!m.units.includes(r.unit)) m.units.push(r.unit);
     if (!m.sources.includes(r.source)) m.sources.push(r.source);
     const area = r.context?.area; if (area && !m.areas.includes(area)) m.areas.push(area);
-    m.latest = { value: r.value, unit: r.unit, occurred_at: r.occurred_at, source: r.source };
+    m.latest = { value: r.value, unit: r.unit, ...(r.context?.reps != null ? { reps: r.context.reps } : {}), occurred_at: r.occurred_at, source: r.source };
     by.set(r.metric, m);
   }
   const metrics = [...by.values()].sort((a, b) => a.metric.localeCompare(b.metric)).map(m => ({
     metric: m.metric, unit: m.units.length === 1 ? m.units[0] : m.units, readings: m.readings, latest: m.latest, sources: m.sources,
     ...(m.areas.length ? { area: m.areas.length === 1 ? m.areas[0] : m.areas } : {}),
-    on_body_page: m.metric === 'weight' || m.areas.includes('body'),
+    on_body_page: m.metric === 'weight' || m.areas.includes('body'), on_gym_page: m.areas.includes('gym'),
     ...(/_est$/.test(m.metric) ? { estimate: true } : {})
   }));
   return { metrics: metrics.length, rows: metrics,
@@ -250,6 +254,8 @@ export function bodyServer() {
       'you have not seen in this conversation, call list and reuse an existing name and unit if one ' +
       'already carries that fact; never make a near-duplicate of a metric that exists. A new metric is a ' +
       'cost, not a free addition. Weight stays as it is: unit kg or lbs, always on the BODY page. ' +
+      'area body puts a metric on the BODY page and area gym on the GYM page, where each lift is one line; ' +
+      'a lift takes reps as well, the count the user said, kept beside the weight. ' +
       'A number you read off a photo the user sent is not a measurement: it goes through estimate, never ' +
       'record, under a name ending _est and signed photo. An estimate is a guess. Say so every time you ' +
       'show or mention one, and never present it as a measurement or beside one as if it were. estimate ' +
@@ -264,8 +270,10 @@ export function bodyServer() {
     'shape the BODY page writes. metric is any name the user gives, written in lowercase with underscores: ' +
     'weight (unit kg or lbs) or anything else with the unit the user named. Call list first for a name you ' +
     'have not seen in this conversation and reuse an existing one instead of making a duplicate. ' +
-    'area is optional: body puts the metric on the BODY page beside weight; left out, the reading is in ' +
-    'the record and in history but not on that page. A name ending _est is refused, because that is an ' +
+    'area is optional, body or gym: body puts the metric on the BODY page beside weight, gym on the GYM ' +
+    'page as a lift, one line per lift; left out, the reading is in the record and in history but on ' +
+    'neither page. reps is optional, for a lift: the whole number of repetitions the user said, saved ' +
+    'beside the weight and shown under the reading. A name ending _est is refused, because that is an ' +
     'estimate and goes through estimate. value is the number exactly as the user said it. occurred_at is when the user ' +
     'measured, as an ISO 8601 timestamp with its zone; ask if unsure, and never use a future time. ' +
     'Without confirmed, nothing is written: the exact row is returned for you to print to the user. ' +
@@ -276,18 +284,19 @@ export function bodyServer() {
       value: z.union([z.number(), z.string()]),
       unit: z.string(),
       occurred_at: z.string(),
-      area: z.string().optional(),
+      area: z.enum(AREAS).optional(),
+      reps: z.number().int().positive().optional(),
       confirmed: z.boolean().optional()
     },
-    async ({ metric, value, unit, occurred_at, area, confirmed = false }) => {
+    async ({ metric, value, unit, occurred_at, area, reps, confirmed = false }) => {
       if (!confirmed) {
-        const drafted = draftRow({ metric, value, unit, occurred_at, area });
+        const drafted = draftRow({ metric, value, unit, occurred_at, area, reps });
         if (drafted.error) return fail({ error: 'nothing written: ' + drafted.error });
-        return text({ proposed: { ...drafted.row, source: SOURCE, event_type: 'measurement', context: contextFor(drafted.row.metric, area || undefined) },
+        return text({ proposed: { ...drafted.row, source: SOURCE, event_type: 'measurement', context: drafted.context },
           say: 'nothing written yet. Print this row to the user; call record again with confirmed true only if they say yes' });
       }
       try {
-        const out = await writeReading({ metric, value, unit, occurred_at, area });
+        const out = await writeReading({ metric, value, unit, occurred_at, area, reps });
         return out.error ? fail(out) : text(out);
       } catch (e) { return fail({ error: 'nothing written: ' + e.message }); }
     }
@@ -295,9 +304,9 @@ export function bodyServer() {
 
   server.tool(
     'list',
-    'Every metric already in the record, once each, sorted by name: its unit, how many readings, the ' +
-    'latest reading with when it was measured, which inputs wrote it, and whether it shows on the BODY ' +
-    'page. Call it before recording under a name you have not seen in this conversation, and reuse an ' +
+    'Every metric already in the record, once each, sorted by name: its area, its unit, how many readings, ' +
+    'the latest reading (with reps for a lift) and when it was measured, which inputs wrote it, and whether ' +
+    'it shows on the BODY or GYM page. Call it before recording under a name you have not seen in this conversation, and reuse an ' +
     'existing name and unit instead of making a duplicate. It writes nothing.',
     {},
     async () => {
