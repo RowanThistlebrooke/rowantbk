@@ -53,7 +53,7 @@ The token goes in the header and never in the address, because an address ends u
 
 ### The MCP tools
 
-The endpoint has three tools. **record** takes `metric`, `value`, `unit` and `occurred_at`; called without confirmation it returns the exact row and writes nothing, and it writes only when called again with `confirmed: true` after your yes. **history** takes `metric` and `days` and reads your readings back. Claude transcribes a number you gave it; it never estimates, rounds, converts or invents one. There is no update and no delete.
+The endpoint has four tools. **record** takes any metric you name, not only body measurements: `metric` in lowercase with underscores, `value` exactly as you said it, the `unit` you said, and `occurred_at`. Called without confirmation it returns the exact row and writes nothing, and it writes only when called again with `confirmed: true` after your yes. Weight keeps its rule, kg or lbs, and is always on the BODY page; another metric shows on the page only when you ask for it there (`area: "body"`), and otherwise stays in the record, in history and in the list. **list** returns every metric already recorded, once each, with its unit, how many readings, the latest reading and where it shows. Claude is told to call it before recording under a name it has not seen and to reuse an existing name and unit rather than make a duplicate: a new metric is a cost, not a free addition. **history** takes `metric` and `days` and reads your readings back. Claude transcribes a number you gave it; it never estimates, rounds, converts or invents one. There is no update and no delete.
 
 **estimate** is for a photo you send in the chat. Claude reads a guess off it, `bodyfat_est` (percent) and `muscle_est` (a 1 to 10 rating), and writes it with `source: "photo"` and the name of the model that read it. The same confirm rule applies: the exact rows first, a write only after your yes. An estimate is a guess, and Claude is told to say so every time and never to present one as a measurement. The tool writes only names ending `_est`, never weight or any measured metric, and never changes or replaces a measured reading; `record` refuses `_est` names in turn, so the two can never mix. On the page an estimate is its own entry in the measurement picker, labelled **estimate**, and never appears on the weight line.
 
@@ -61,7 +61,7 @@ Every request must carry `WIRE_TOKEN`; without the token, or with `WIRE_TOKEN` u
 
 ## What the graph means
 
-Each point is a recorded reading, shown in its original units. Weight in kg and weight in lbs stay separate. Additional BODY measurements use the same layout, one measurement and unit at a time. The graph always shows recorded values, separate from the sidebar index.
+Each point is a recorded reading, shown in its original units. Weight in kg and weight in lbs stay separate. Additional BODY measurements use the same layout, one measurement and unit at a time. A metric recorded through the MCP without `area: "body"` is in your record and its history but not on this graph. The graph always shows recorded values, separate from the sidebar index.
 
 Lines connect readings. Dashed spans are more than a day apart and do not fill in missing values. Readings retain both **when measured** and **when saved**. This starter shows the original raw record; it does not apply corrections/voids, estimate values, or claim what caused a change.
 
@@ -96,7 +96,7 @@ All inputs append to `public.events`. Read every page of history in a stable ord
 | `occurred_at` | User-confirmed measurement time | User-confirmed photo time; the moment it arrived for `/api/photo` |
 | `source` | `pad` for this page, `claude` for MCP, `photo` for an MCP estimate | `pad` for this page, `shortcut` for `/api/photo` |
 | `source_id` | Stable ID for one save/retry | Stable UUID for one save/retry |
-| `context` | `{ "area": "body" }`; an estimate adds `estimate: true` and `model` | Fields below |
+| `context` | `{ "area": "body" }` for weight and body measurements; `{ "schema_version": 1 }` alone for a metric outside the page; an estimate adds `estimate: true` and `model` | Fields below |
 
 Photo context contains `area: "body"`, `schema_version: 1`, `bucket: "body-progress"`, `path`, `mime_type`, `bytes` and `sha256`. The path is `<authenticated user ID>/<upload UUID>.<extension>`; it references a private Storage object. Do not store photo bytes, public URLs or expiring signed URLs in the event.
 
