@@ -22,7 +22,7 @@ http.createServer(async (request, response) => {
   if (pathname === '/api/config') return config(request, response);
   if (pathname === '/api/mcp') return mcp(request, response);
   if (pathname === '/api/photo') { request.query = Object.fromEntries(new URL(request.url, 'http://localhost').searchParams); return (await import('./api/photo.mjs')).default(request, response); }
-  const pages={'/':'index.html','/index.html':'index.html','/you-reader.js':'you-reader.js','/body-index.js':'body-index.js'};
+  const pages={'/':'index.html','/index.html':'index.html','/gym.html':'gym.html','/you-reader.js':'you-reader.js','/body-index.js':'body-index.js'};
   if (request.method !== 'GET' || !Object.hasOwn(pages,pathname)) {
     response.writeHead(404, {'Content-Type': 'text/plain'});
     response.end('Not found');

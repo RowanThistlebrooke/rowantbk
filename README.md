@@ -2,7 +2,7 @@
 
 **A graph. The readings behind it. Your progress photos.**
 
-[index.html](index.html) is the page: plain HTML, CSS and JavaScript, with a pinned Supabase browser client and the shared Wire index reader. It starts with measured weight and grows as you add readings. No framework or build step.
+[index.html](index.html) is the page: plain HTML, CSS and JavaScript, with a pinned Supabase browser client and the shared Wire index reader. It starts with measured weight and grows as you add readings. No framework or build step. [gym.html](gym.html) is its second page, in the same design, for your lifts.
 
 ## First: deploy BODY
 
@@ -53,15 +53,19 @@ The token goes in the header and never in the address, because an address ends u
 
 ### The MCP tools
 
-The endpoint has four tools. **record** takes any metric you name, not only body measurements: `metric` in lowercase with underscores, `value` exactly as you said it, the `unit` you said, and `occurred_at`. Called without confirmation it returns the exact row and writes nothing, and it writes only when called again with `confirmed: true` after your yes. Weight keeps its rule, kg or lbs, and is always on the BODY page; another metric shows on the page only when you ask for it there (`area: "body"`), and otherwise stays in the record, in history and in the list. **list** returns every metric already recorded, once each, with its unit, how many readings, the latest reading and where it shows. Claude is told to call it before recording under a name it has not seen and to reuse an existing name and unit rather than make a duplicate: a new metric is a cost, not a free addition. **history** takes `metric` and `days` and reads your readings back. Claude transcribes a number you gave it; it never estimates, rounds, converts or invents one. There is no update and no delete.
+The endpoint has four tools. **record** takes any metric you name, not only body measurements: `metric` in lowercase with underscores, `value` exactly as you said it, the `unit` you said, `occurred_at`, and optionally `area` and `reps`, both saved in the row's context. `area` is `body` or `gym`: body puts the metric on the BODY page beside weight, gym on the GYM page as a lift; left out, the reading stays in the record, in history and in the list, but on neither page. `reps` is the whole number of repetitions you said, for a lift. Called without confirmation it returns the exact row and writes nothing, and it writes only when called again with `confirmed: true` after your yes. Weight keeps its rule, kg or lbs, and is always area body. **list** returns every metric already recorded, once each, with its area, unit, how many readings, the latest reading (with reps for a lift) and where it shows. Claude is told to call it before recording under a name it has not seen and to reuse an existing name and unit rather than make a duplicate: a new metric is a cost, not a free addition. **history** takes `metric` and `days` and reads your readings back. Claude transcribes a number you gave it; it never estimates, rounds, converts or invents one. There is no update and no delete.
 
 **estimate** is for a photo you send in the chat. Claude reads a guess off it, `bodyfat_est` (percent) and `muscle_est` (a 1 to 10 rating), and writes it with `source: "photo"` and the name of the model that read it. The same confirm rule applies: the exact rows first, a write only after your yes. An estimate is a guess, and Claude is told to say so every time and never to present one as a measurement. The tool writes only names ending `_est`, never weight or any measured metric, and never changes or replaces a measured reading; `record` refuses `_est` names in turn, so the two can never mix. On the page an estimate is its own entry in the measurement picker, labelled **estimate**, and never appears on the weight line.
 
 Every request must carry `WIRE_TOKEN`; without the token, or with `WIRE_TOKEN` unset, nothing gets in. Row-level security still applies, because the endpoint holds only the publishable key and your own login. Treat the token like a password: anyone who has it can append to your record. Rotate it in Vercel if it leaks. The local preview also serves `/api/mcp` when the five settings are in `.env.local`, after `npm install`.
 
+## Your lifts: GYM
+
+[gym.html](gym.html) shows rows whose context area is `gym`, and nothing else: one line graph per lift, the **top weight of each day** as its point, with the reps of that set under each reading. **Behind the graph** lists every set with its weight, reps, time and source. It uses the same sign-in as BODY, remembered across both pages, and logs nothing itself: lifts arrive through the MCP. Say **"log bench press, 80 kg for 5"** on your phone; Claude records `bench_press`, `80`, `kg`, area `gym`, reps `5` after you say yes, and the line appears. The page is empty until the first lift is logged. **Gym** in the sidebar opens it; **Body** brings you back.
+
 ## What the graph means
 
-Each point is a recorded reading, shown in its original units. Weight in kg and weight in lbs stay separate. Additional BODY measurements use the same layout, one measurement and unit at a time. A metric recorded through the MCP without `area: "body"` is in your record and its history but not on this graph. The graph always shows recorded values, separate from the sidebar index.
+Each point is a recorded reading, shown in its original units. Weight in kg and weight in lbs stay separate. Additional BODY measurements use the same layout, one measurement and unit at a time. A metric recorded through the MCP without `area: "body"` is in your record and its history but not on this graph; one with `area: "gym"` is on the GYM page. The graph always shows recorded values, separate from the sidebar index.
 
 Lines connect readings. Dashed spans are more than a day apart and do not fill in missing values. Readings retain both **when measured** and **when saved**. This starter shows the original raw record; it does not apply corrections/voids, estimate values, or claim what caused a change.
 
@@ -96,7 +100,7 @@ All inputs append to `public.events`. Read every page of history in a stable ord
 | `occurred_at` | User-confirmed measurement time | User-confirmed photo time; the moment it arrived for `/api/photo` |
 | `source` | `pad` for this page, `claude` for MCP, `photo` for an MCP estimate | `pad` for this page, `shortcut` for `/api/photo` |
 | `source_id` | Stable ID for one save/retry | Stable UUID for one save/retry |
-| `context` | `{ "area": "body" }` for weight and body measurements; `{ "schema_version": 1 }` alone for a metric outside the page; an estimate adds `estimate: true` and `model` | Fields below |
+| `context` | `{ "area": "body" }` for weight and body measurements, `{ "area": "gym", "reps": 5 }` for a lift; `{ "schema_version": 1 }` alone for a metric on neither page; an estimate adds `estimate: true` and `model` | Fields below |
 
 Photo context contains `area: "body"`, `schema_version: 1`, `bucket: "body-progress"`, `path`, `mime_type`, `bytes` and `sha256`. The path is `<authenticated user ID>/<upload UUID>.<extension>`; it references a private Storage object. Do not store photo bytes, public URLs or expiring signed URLs in the event.
 
@@ -117,6 +121,6 @@ grant select, insert on public.events to authenticated;
 
 Keep row-level security enabled. Only a publishable key belongs in this page; never use a secret or service-role key.
 
-Local preview (Node.js 22+): copy `.env.example` to `.env.local`, fill in the two public settings, then run `node --env-file=.env.local dev.js` and open `http://localhost:8797`. The preview serves the page and `/api/config`, and `/api/mcp` and `/api/photo` once you run `npm install` and fill in the three `WIRE_…` settings; an ordinary static file server cannot provide the connection settings. `.env.local` is ignored by Git.
+Local preview (Node.js 22+): copy `.env.example` to `.env.local`, fill in the two public settings, then run `node --env-file=.env.local dev.js` and open `http://localhost:8797`. The preview serves both pages and `/api/config`, and `/api/mcp` and `/api/photo` once you run `npm install` and fill in the three `WIRE_…` settings; an ordinary static file server cannot provide the connection settings. `.env.local` is ignored by Git.
 
 [Supabase private buckets](https://supabase.com/docs/guides/storage/buckets/fundamentals) · [Storage access policies](https://supabase.com/docs/guides/storage/security/access-control) · [Upload](https://supabase.com/docs/reference/javascript/file-buckets-upload) · [Private download](https://supabase.com/docs/reference/javascript/file-buckets-download) · [Public API keys](https://supabase.com/docs/guides/api/api-keys)
